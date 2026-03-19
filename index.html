@@ -8,11 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #111113; --panel: #18181b; --border: #2d2d32;
-    --amber: #f5a623; --amber-dim: #c07820; --amber-glow: rgba(245,166,35,.15);
-    --text: #ddd8cc; --muted: #5a5a62;
-    --form-bg: #f9f8f5; --ink: #111; --rule: #c0bbb4; --err: #e05555;
+    --bg: #111113;
+    --panel: #18181b;
+    --border: #2d2d32;
+    --amber: #f5a623;
+    --amber-dim: #c07820;
+    --amber-glow: rgba(245,166,35,.15);
+    --text: #ddd8cc;
+    --muted: #5a5a62;
+    --form-bg: #f9f8f5;
+    --ink: #111;
+    --rule: #c0bbb4;
+    --err: #e05555;
   }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -26,161 +35,381 @@
 
   /* ── App Bar ── */
   #appBar {
-    position: sticky; top: 0; z-index: 100;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     background: linear-gradient(180deg, #222226 0%, #18181b 100%);
     border-bottom: 1px solid #2a2a2e;
     box-shadow: 0 1px 0 rgba(245,166,35,.4), 0 4px 24px rgba(0,0,0,.5);
     padding: 8px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
   }
 
   .app-title {
-    font-size: 14px; font-weight: 700; letter-spacing: 3px;
-    color: var(--amber); text-transform: uppercase; white-space: nowrap;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    white-space: nowrap;
     text-shadow: 0 0 20px rgba(245,166,35,.4);
   }
 
   .epr-toggle {
     display: flex;
     border: 1px solid var(--amber-dim);
-    border-radius: 4px; overflow: hidden;
+    border-radius: 4px;
+    overflow: hidden;
     box-shadow: 0 0 12px rgba(245,166,35,.1);
   }
+
   .epr-btn {
-    background: transparent; color: var(--amber-dim);
-    border: none; padding: 5px 22px;
+    background: transparent;
+    color: var(--amber-dim);
+    border: none;
+    padding: 5px 22px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2.5px;
-    cursor: pointer; transition: background .2s, color .2s, box-shadow .2s;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    cursor: pointer;
+    transition: background .2s, color .2s, box-shadow .2s;
     text-transform: uppercase;
   }
+
   .epr-btn + .epr-btn { border-left: 1px solid var(--amber-dim); }
+
   .epr-btn.active {
     background: linear-gradient(180deg, #f5a623 0%, #d48a10 100%);
-    color: #000; box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+    color: #000;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
   }
-  .epr-btn:not(.active):hover { background: var(--amber-glow); color: var(--amber); }
+
+  .epr-btn:not(.active):hover {
+    background: var(--amber-glow);
+    color: var(--amber);
+  }
 
   /* Page nav */
-  .nav-cluster { display: flex; align-items: center; gap: 6px; margin-left: 8px; }
+  .nav-cluster {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+  }
+
   .nav-arrow {
     background: transparent;
-    border: 1px solid var(--amber-dim); color: var(--amber);
-    width: 28px; height: 28px; border-radius: 4px;
-    cursor: pointer; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .15s; font-family: serif;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    font-family: serif;
   }
-  .nav-arrow:hover:not(:disabled) { background: var(--amber); color: #000; box-shadow: 0 0 10px rgba(245,166,35,.3); }
-  .nav-arrow:disabled { opacity: 0.2; cursor: default; }
+
+  .nav-arrow:hover:not(:disabled) {
+    background: var(--amber);
+    color: #000;
+    box-shadow: 0 0 10px rgba(245,166,35,.3);
+  }
+
+  .nav-arrow:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
   .nav-info {
-    font-size: 11.5px; letter-spacing: 1.5px; color: var(--amber);
-    white-space: nowrap; min-width: 78px; text-align: center;
+    font-size: 11.5px;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    white-space: nowrap;
+    min-width: 78px;
+    text-align: center;
     text-shadow: 0 0 12px rgba(245,166,35,.3);
   }
 
   .ro-badge {
     background: linear-gradient(135deg, #2a1e08, #3a2a10);
-    border: 1px solid var(--amber-dim); color: var(--amber);
-    font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
-    padding: 3px 10px; border-radius: 3px; text-transform: uppercase;
-    display: none; box-shadow: 0 0 10px rgba(245,166,35,.15);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    display: none;
+    box-shadow: 0 0 10px rgba(245,166,35,.15);
   }
+
   .ro-badge.show { display: inline-block; }
 
-  .bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .bar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 
   .btn {
-    font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 5px 14px; border-radius: 4px;
-    cursor: pointer; border: none; transition: all .15s; white-space: nowrap;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    white-space: nowrap;
   }
+
   .btn-ghost {
-    background: transparent; border: 1px solid #333338; color: var(--muted);
+    background: transparent;
+    border: 1px solid #333338;
+    color: var(--muted);
   }
-  .btn-ghost:hover { border-color: var(--amber-dim); color: var(--amber); background: var(--amber-glow); }
-  .btn-warn { background: transparent; border: 1px solid #4a3020; color: #c08040; }
-  .btn-warn:hover { background: rgba(200,120,40,.12); border-color: var(--amber-dim); color: var(--amber); }
+
+  .btn-ghost:hover {
+    border-color: var(--amber-dim);
+    color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .btn-warn {
+    background: transparent;
+    border: 1px solid #4a3020;
+    color: #c08040;
+  }
+
+  .btn-warn:hover {
+    background: rgba(200,120,40,.12);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+
   .btn-primary {
     background: linear-gradient(180deg, #f5a623 0%, #d48a10 100%);
-    color: #000; box-shadow: 0 2px 8px rgba(245,166,35,.25), inset 0 1px 0 rgba(255,255,255,.2);
+    color: #000;
+    box-shadow: 0 2px 8px rgba(245,166,35,.25), inset 0 1px 0 rgba(255,255,255,.2);
   }
-  .btn-primary:hover { background: linear-gradient(180deg, #ffc547 0%, #e8a020 100%); box-shadow: 0 4px 16px rgba(245,166,35,.4); }
-  .btn-outline { background: transparent; border: 1px solid var(--amber-dim); color: var(--amber); }
-  .btn-outline:hover { background: var(--amber-glow); box-shadow: 0 0 10px rgba(245,166,35,.15); }
-  .btn-danger { background: transparent; border: 1px solid #4a2222; color: #bb5555; }
-  .btn-danger:hover { background: rgba(200,60,60,.1); border-color: #884444; }
+
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #ffc547 0%, #e8a020 100%);
+    box-shadow: 0 4px 16px rgba(245,166,35,.4);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+  }
+
+  .btn-outline:hover {
+    background: var(--amber-glow);
+    box-shadow: 0 0 10px rgba(245,166,35,.15);
+  }
+
+  .btn-danger {
+    background: transparent;
+    border: 1px solid #4a2222;
+    color: #bb5555;
+  }
+
+  .btn-danger:hover {
+    background: rgba(200,60,60,.1);
+    border-color: #884444;
+  }
 
   /* ── Book Stage ── */
   .stage {
-    display: flex; align-items: flex-start; justify-content: center;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
     padding: 44px 20px 80px;
   }
 
   /* ── Book Wrap ── */
-  .book-wrap { position: relative; flex-shrink: 0; perspective: 2000px; perspective-origin: center 38%; }
+  .book-wrap {
+    position: relative;
+    flex-shrink: 0;
+    perspective: 2200px;
+    perspective-origin: center 38%;
+    transform-style: preserve-3d;
+  }
 
-  .page-ghost { position: absolute; border: 1px solid #c8c3bb; }
-  .page-ghost-1 { top: 6px; left: 6px; right: -6px; bottom: -6px; z-index: 1; background: #edeae3; }
-  .page-ghost-2 { top: 12px; left: 12px; right: -12px; bottom: -12px; z-index: 0; background: #e7e3db; }
-  .page-ghost-3 { top: 18px; left: 18px; right: -18px; bottom: -18px; z-index: -1; background: #e0dbd3; }
+  .page-ghost {
+    position: absolute;
+    border: 1px solid #c8c3bb;
+    box-shadow: 0 8px 22px rgba(0,0,0,.16);
+  }
 
-  /* ── Two-panel page flipper ── */
+  .page-ghost-1 {
+    top: 5px;
+    left: 5px;
+    right: -5px;
+    bottom: -5px;
+    z-index: 1;
+    background: #efece5;
+    transform: rotate(.12deg);
+  }
+
+  .page-ghost-2 {
+    top: 10px;
+    left: 10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: 0;
+    background: #e7e3db;
+    transform: rotate(-.10deg);
+  }
+
+  .page-ghost-3 {
+    top: 15px;
+    left: 15px;
+    right: -15px;
+    bottom: -15px;
+    z-index: -1;
+    background: #dfdad1;
+    transform: rotate(.08deg);
+  }
+
+  /* ── Improved page flipper ── */
   #flipper {
     display: none;
-    position: absolute; top: 0; left: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 760px;
-    z-index: 20;
+    z-index: 30;
     transform-style: preserve-3d;
     pointer-events: none;
+    will-change: transform, filter;
   }
 
-  #flip-front {
-    position: absolute; inset: 0;
-    background: var(--form-bg);
-    border-top: 2px solid rgba(245,166,35,.3);
-    backface-visibility: hidden;
-    box-shadow: 0 0 0 1px rgba(245,166,35,.12), 0 12px 60px rgba(0,0,0,.8), 0 4px 16px rgba(0,0,0,.5);
-  }
-
-  /* Front face highlight — simulates light catching the lifted edge */
-  #flip-front::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(to right, transparent 60%, rgba(255,255,255,.18) 100%);
-    pointer-events: none;
-  }
-
+  #flip-front,
   #flip-back {
-    position: absolute; inset: 0;
-    background: linear-gradient(160deg, #e8e5de 0%, #ddd9d1 100%);
+    position: absolute;
+    inset: 0;
     backface-visibility: hidden;
-    transform: rotateY(180deg);
+    -webkit-backface-visibility: hidden;
+    border-top: 2px solid rgba(245,166,35,.22);
     overflow: hidden;
   }
 
-  /* Back face fold shadow — dark at spine, fades out */
-  #flip-back-shadow {
-    position: absolute; inset: 0;
+  #flip-front {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 22%),
+      linear-gradient(90deg, rgba(0,0,0,.03), rgba(255,255,255,.02) 12%, rgba(255,255,255,0) 30%),
+      var(--form-bg);
+    box-shadow:
+      0 0 0 1px rgba(245,166,35,.08),
+      0 16px 60px rgba(0,0,0,.42),
+      0 8px 18px rgba(0,0,0,.24);
+    transform: translateZ(1px);
   }
 
-  /* Shadow that sweeps across the form underneath during the flip */
+  #flip-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.05) 22%,
+        rgba(255,255,255,.20) 45%,
+        rgba(255,255,255,.04) 62%,
+        rgba(255,255,255,0) 100%);
+    opacity: .75;
+    transform: translateX(0);
+    pointer-events: none;
+  }
+
+  #flip-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right,
+        rgba(0,0,0,.05) 0%,
+        rgba(255,255,255,.02) 8%,
+        rgba(255,255,255,.12) 70%,
+        rgba(255,255,255,.22) 100%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: .65;
+  }
+
+  #flip-back {
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.02), rgba(255,255,255,.03) 20%, rgba(0,0,0,.03) 100%),
+      linear-gradient(160deg, #ebe8e1 0%, #ddd8cf 100%);
+    transform: rotateY(180deg) translateZ(1px);
+    box-shadow:
+      inset 0 0 18px rgba(0,0,0,.08),
+      inset 0 0 2px rgba(255,255,255,.35);
+  }
+
+  #flip-back-shadow {
+    position: absolute;
+    inset: 0;
+    opacity: .9;
+    pointer-events: none;
+  }
+
+  #flip-curve {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 31;
+    background:
+      radial-gradient(120% 70% at 50% 50%,
+        rgba(255,255,255,.00) 0%,
+        rgba(255,255,255,.03) 44%,
+        rgba(0,0,0,.08) 72%,
+        rgba(0,0,0,.16) 100%);
+    mix-blend-mode: multiply;
+    filter: blur(1px);
+    display: none;
+  }
+
   #flip-underlay-shadow {
     display: none;
-    position: absolute; top: 0; left: 0;
-    width: 760px; z-index: 5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 760px;
+    z-index: 8;
     pointer-events: none;
-    transition: opacity 0.1s;
+    opacity: 0;
+    filter: blur(8px);
+    will-change: opacity, transform;
   }
 
   /* ── Form Sheet ── */
   .form-sheet {
-    position: relative; z-index: 2;
-    background: var(--form-bg); color: var(--ink);
-    width: 760px; padding: 24px 34px 20px;
+    position: relative;
+    z-index: 2;
+    background: var(--form-bg);
+    color: var(--ink);
+    width: 760px;
+    padding: 24px 34px 20px;
     font-family: 'Courier Prime', monospace;
-    font-size: 12.5px; line-height: 1.5;
+    font-size: 12.5px;
+    line-height: 1.5;
     box-shadow:
       0 0 0 1px rgba(245,166,35,.12),
       0 12px 60px rgba(0,0,0,.8),
@@ -188,18 +417,27 @@
       0 0 80px rgba(245,166,35,.04);
     border-top: 2px solid rgba(245,166,35,.3);
   }
+
   .form-sheet.flipping { opacity: 0; }
 
   /* Read-only banner */
   .ro-banner {
     display: none;
     background: linear-gradient(135deg, #2a1e08, #3d2a0e);
-    border: 1px solid var(--amber-dim); border-radius: 2px;
-    color: var(--amber); font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 700; letter-spacing: 3px;
-    text-align: center; padding: 5px; margin-bottom: 10px;
-    text-transform: uppercase; box-shadow: 0 0 16px rgba(245,166,35,.1);
+    border: 1px solid var(--amber-dim);
+    border-radius: 2px;
+    color: var(--amber);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    box-shadow: 0 0 16px rgba(245,166,35,.1);
   }
+
   .ro-banner.show { display: block; }
 
   .form-sheet.readonly input,
@@ -222,70 +460,132 @@
   .ir-lbl .arrow { font-weight: 400; color: #444; }
 
   .fi {
-    border: none; border-bottom: 1px solid var(--rule);
-    background: transparent; font-family: 'Courier Prime', monospace;
-    font-size: 12.5px; color: var(--ink);
-    padding: 1px 3px; outline: none; height: 22px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12.5px;
+    color: var(--ink);
+    padding: 1px 3px;
+    outline: none;
+    height: 22px;
     transition: border-color .15s, background .15s;
   }
+
   .fi:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); }
-  .fi-md { width: 155px; } .fi-xs { width: 52px; } .fi-op { width: 108px; } .fi-run { width: 62px; }
+  .fi-md { width: 155px; }
+  .fi-xs { width: 52px; }
+  .fi-op { width: 108px; }
+  .fi-run { width: 62px; }
 
   input[type="date"] {
-    border: none; border-bottom: 1px solid var(--rule); background: transparent;
-    font-family: 'Courier Prime', monospace; font-size: 11.5px; color: var(--ink);
-    padding: 1px 2px; outline: none; height: 22px; cursor: pointer;
-    transition: border-color .15s, background .15s; width: 132px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    padding: 1px 2px;
+    outline: none;
+    height: 22px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    width: 132px;
   }
+
   input[type="date"]:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); }
 
   /* ── Custom Time Picker ── */
   .tp-wrap { position: relative; display: inline-block; }
+
   .tp-btn {
-    border: none; border-bottom: 1px solid var(--rule);
-    background: transparent; font-family: 'Courier Prime', monospace;
-    font-size: 11.5px; color: var(--ink); padding: 1px 4px;
-    height: 22px; cursor: pointer; width: 68px; text-align: left;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    padding: 1px 4px;
+    height: 22px;
+    cursor: pointer;
+    width: 68px;
+    text-align: left;
     transition: border-color .15s, background .15s;
   }
-  .tp-btn:hover, .tp-btn:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); outline: none; }
+
+  .tp-btn:hover,
+  .tp-btn:focus {
+    border-bottom-color: #c07820;
+    background: rgba(245,166,35,.06);
+    outline: none;
+  }
+
   .tp-btn.has-value { color: var(--ink); }
   .tp-btn.empty { color: #aaa; }
 
   .tp-popup {
-    display: none; position: absolute;
-    top: 0; left: calc(100% + 6px);
+    display: none;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 6px);
     z-index: 999;
     background: linear-gradient(160deg, #1a2630, #162028);
     border: 1px solid #2e8fa0;
-    border-radius: 6px; padding: 10px;
+    border-radius: 6px;
+    padding: 10px;
     box-shadow: 0 12px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(46,143,160,.2);
-    user-select: none; white-space: nowrap;
+    user-select: none;
+    white-space: nowrap;
   }
+
   .tp-popup.open { display: flex; gap: 10px; }
 
   .tp-col { display: flex; flex-direction: column; gap: 5px; }
+
   .tp-col-hdr {
     background: linear-gradient(180deg, #2e8fa0, #227080);
-    color: #fff; text-align: center;
+    color: #fff;
+    text-align: center;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 12px; font-weight: 700; letter-spacing: 2px;
-    padding: 4px 0; border-radius: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 0;
+    border-radius: 3px;
     box-shadow: 0 2px 8px rgba(0,0,0,.3);
   }
+
   .tp-grid { display: grid; gap: 2px; }
   .tp-hr-grid { grid-template-columns: repeat(4, 30px); }
   .tp-mn-grid { grid-template-columns: repeat(10, 26px); }
 
   .tp-cell {
-    background: #1e3040; color: #8ab8cc;
-    border: 1px solid #1e3a4a; border-radius: 2px;
-    font-family: 'Courier Prime', monospace; font-size: 11px;
-    text-align: center; padding: 3px 0; cursor: pointer;
+    background: #1e3040;
+    color: #8ab8cc;
+    border: 1px solid #1e3a4a;
+    border-radius: 2px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    text-align: center;
+    padding: 3px 0;
+    cursor: pointer;
     transition: all .1s;
   }
-  .tp-cell:hover { background: #2a6878; color: #fff; border-color: #4ab0c0; transform: scale(1.05); }
-  .tp-cell.selected { background: linear-gradient(180deg, #2e8fa0, #1e6878); color: #fff; border-color: #4ac8da; font-weight: 700; box-shadow: 0 0 6px rgba(46,143,160,.4); }
+
+  .tp-cell:hover {
+    background: #2a6878;
+    color: #fff;
+    border-color: #4ab0c0;
+    transform: scale(1.05);
+  }
+
+  .tp-cell.selected {
+    background: linear-gradient(180deg, #2e8fa0, #1e6878);
+    color: #fff;
+    border-color: #4ac8da;
+    font-weight: 700;
+    box-shadow: 0 0 6px rgba(46,143,160,.4);
+  }
 
   .mach-area { display: flex; align-items: center; gap: 18px; margin-bottom: 5px; font-size: 12px; }
   .mach-lbl { display: flex; gap: 4px; font-weight: 700; align-items: center; }
@@ -314,32 +614,48 @@
 
   /* ── Toast ── */
   #toast {
-    position: fixed; bottom: 28px; left: 50%;
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
     transform: translateX(-50%) translateY(16px);
     background: linear-gradient(135deg, #1e1e22, #252528);
     color: var(--text);
-    border: 1px solid #333338; border-left: 3px solid var(--amber);
-    padding: 11px 22px; border-radius: 6px;
-    font-size: 13px; font-weight: 600; letter-spacing: .5px;
-    opacity: 0; transition: opacity .25s, transform .25s;
-    z-index: 400; pointer-events: none; white-space: nowrap;
+    border: 1px solid #333338;
+    border-left: 3px solid var(--amber);
+    padding: 11px 22px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    opacity: 0;
+    transition: opacity .25s, transform .25s;
+    z-index: 400;
+    pointer-events: none;
+    white-space: nowrap;
     box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(245,166,35,.08);
   }
+
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   #toast.err { border-left-color: var(--err); }
 
   /* ── Print ── */
   @page { size: letter portrait; margin: 0; }
+
   @media print {
     #appBar, #toast { display: none !important; }
     body { background: #fff; margin: 0; }
     .stage { padding: 0; }
     .book-wrap { display: block; }
-    .page-ghost-1, .page-ghost-2, .page-ghost-3 { display: none; }
+    .page-ghost-1, .page-ghost-2, .page-ghost-3,
+    #flipper, #flip-curve, #flip-underlay-shadow { display: none !important; }
     .ro-banner { display: none !important; }
     .form-sheet {
-      box-shadow: none; width: 100%; padding: 10px 16px;
-      font-size: 10.5px; zoom: 0.99; opacity: 1 !important;
+      box-shadow: none;
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 10.5px;
+      zoom: 0.99;
+      opacity: 1 !important;
       border-top: none;
     }
     .foil-block { padding: 4px 0 3px; }
@@ -359,13 +675,12 @@
 </head>
 <body>
 
-<!-- ── App Bar ── -->
 <div id="appBar">
   <div class="app-title">TR30 &middot; Foil Log</div>
 
   <div class="epr-toggle">
     <button class="epr-btn active" id="btn41" onclick="switchEPR(41)">EPR-41</button>
-    <button class="epr-btn"        id="btn42" onclick="switchEPR(42)">EPR-42</button>
+    <button class="epr-btn" id="btn42" onclick="switchEPR(42)">EPR-42</button>
   </div>
 
   <div class="nav-cluster">
@@ -378,35 +693,35 @@
   <span class="ro-badge" id="roBadge">Read Only</span>
 
   <div class="bar-right">
-    <button class="btn btn-danger"   id="btnDelete"      onclick="deleteCurrentPage()"  style="display:none">Delete Page</button>
-    <button class="btn btn-outline"  id="btnReprint"     onclick="reprintCurrent()"     style="display:none">Reprint PDF</button>
-    <button class="btn btn-ghost"    id="btnEdit"        onclick="startEdit()"          style="display:none">Edit Record</button>
-    <button class="btn btn-danger"   id="btnCancelEdit"  onclick="cancelEdit()"         style="display:none">Cancel Edit</button>
-    <button class="btn btn-primary"  id="btnSaveEdit"    onclick="saveEdit()"           style="display:none">Save Changes</button>
-    <button class="btn btn-ghost"    onclick="printForm()">Print</button>
-    <button class="btn btn-warn"     id="btnNew"  onclick="newPage()">New Page</button>
-    <button class="btn btn-primary"  id="btnSave" onclick="savePage()">Save + PDF</button>
+    <button class="btn btn-danger" id="btnDelete" onclick="deleteCurrentPage()" style="display:none">Delete Page</button>
+    <button class="btn btn-outline" id="btnReprint" onclick="reprintCurrent()" style="display:none">Reprint PDF</button>
+    <button class="btn btn-ghost" id="btnEdit" onclick="startEdit()" style="display:none">Edit Record</button>
+    <button class="btn btn-danger" id="btnCancelEdit" onclick="cancelEdit()" style="display:none">Cancel Edit</button>
+    <button class="btn btn-primary" id="btnSaveEdit" onclick="saveEdit()" style="display:none">Save Changes</button>
+    <button class="btn btn-ghost" onclick="printForm()">Print</button>
+    <button class="btn btn-warn" id="btnNew" onclick="newPage()">New Page</button>
+    <button class="btn btn-primary" id="btnSave" onclick="savePage()">Save + PDF</button>
   </div>
 </div>
 
-<!-- ── Book Stage ── -->
 <div class="stage">
   <div class="book-wrap" id="bookWrap">
     <div class="page-ghost page-ghost-3"></div>
     <div class="page-ghost page-ghost-2"></div>
     <div class="page-ghost page-ghost-1"></div>
 
-    <!-- Two-panel page flipper (animated overlay) -->
     <div id="flipper">
       <div id="flip-front"></div>
-      <div id="flip-back"><div id="flip-back-shadow"></div></div>
+      <div id="flip-back">
+        <div id="flip-back-shadow"></div>
+      </div>
     </div>
+    <div id="flip-curve"></div>
     <div id="flip-underlay-shadow"></div>
 
     <div class="form-sheet" id="formSheet">
       <div class="ro-banner" id="roBanner">&#128274; Read Only — Saved Record</div>
 
-      <!-- Header -->
       <div class="fhb">
         <div class="fhb-title">Foil Performance Log (TR30)</div>
         <div class="fhb-meta">
@@ -416,7 +731,6 @@
         </div>
       </div>
 
-      <!-- Specs -->
       <div class="sec-specs">
         <div class="instr"><span class="arrow">&#9658;</span><span>Initiate new form when carousel is replaced.</span></div>
         <div class="instr"><span class="arrow">&#9658;</span><span><strong>FOIL SPECIFICATIONS:</strong></span></div>
@@ -428,7 +742,6 @@
         </div>
       </div>
 
-      <!-- Info -->
       <div class="sec-info">
         <div class="ir">
           <div class="ir-lbl"><span class="arrow">&#9658;</span><span>Date Carousel Installed:</span></div>
@@ -455,7 +768,6 @@
         </div>
       </div>
 
-      <!-- Foil Blocks -->
       <div id="foilsContainer"></div>
       <div class="form-footer" id="formFooter">Page 1 of 1</div>
     </div>
@@ -470,39 +782,39 @@ const KEYS = {
   42: { draft: 'fpl_42_draft', pages: 'fpl_42_pages' }
 };
 
-let currentEPR    = 41;
-let viewIndex     = 0;
-let isEditing     = false;  // true when editing a saved record
+let currentEPR = 41;
+let viewIndex = 0;
+let isEditing = false;
 let autosaveTimer = null;
 
 // ── Storage ────────────────────────────────────────────────
-function ls_get(k)      { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
-function ls_set(k, v)   { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-function ls_del(k)      { try { localStorage.removeItem(k); } catch {} }
-function getPages(epr)  { return ls_get(KEYS[epr].pages) || []; }
-function setPages(epr,p){ ls_set(KEYS[epr].pages, p); }
+function ls_get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+function ls_set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function ls_del(k) { try { localStorage.removeItem(k); } catch {} }
+function getPages(epr) { return ls_get(KEYS[epr].pages) || []; }
+function setPages(epr, p) { ls_set(KEYS[epr].pages, p); }
 
 function emptyForm() {
   return {
-    totalThickness:'', lotNumber:'', ovenTemp:'', otherSpec:'',
-    carouselInstalled:'', carouselRemoved:'', machine:'', pos:['','','','',''],
-    foils: Array.from({length:5}, ()=>({
-      startDate:'', startTime:'', startRun:'', startOp:'',
-      endDate:'',   endTime:'',   endRun:'',   endOp:'',
-      totalDose:'', reason:''
+    totalThickness: '', lotNumber: '', ovenTemp: '', otherSpec: '',
+    carouselInstalled: '', carouselRemoved: '', machine: '', pos: ['', '', '', '', ''],
+    foils: Array.from({ length: 5 }, () => ({
+      startDate: '', startTime: '', startRun: '', startOp: '',
+      endDate: '', endTime: '', endRun: '', endOp: '',
+      totalDose: '', reason: ''
     }))
   };
 }
 
 // ── Toast ──────────────────────────────────────────────────
 let toastTimer;
-function showToast(msg, isErr=false) {
+function showToast(msg, isErr = false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.toggle('err', isErr);
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> t.classList.remove('show'), isErr ? 5000 : 3200);
+  toastTimer = setTimeout(() => t.classList.remove('show'), isErr ? 5000 : 3200);
 }
 
 // ── Render foil blocks ─────────────────────────────────────
@@ -547,70 +859,85 @@ function renderFoils() {
 // ── Load / Read ────────────────────────────────────────────
 function loadForm(data) {
   const d = data || emptyForm();
-  document.getElementById('totalThickness').value    = d.totalThickness || '';
-  document.getElementById('lotNumber').value         = d.lotNumber      || '';
-  document.getElementById('ovenTemp').value          = d.ovenTemp       || '';
-  document.getElementById('otherSpec').value         = d.otherSpec      || '';
+  document.getElementById('totalThickness').value = d.totalThickness || '';
+  document.getElementById('lotNumber').value = d.lotNumber || '';
+  document.getElementById('ovenTemp').value = d.ovenTemp || '';
+  document.getElementById('otherSpec').value = d.otherSpec || '';
   document.getElementById('carouselInstalled').value = d.carouselInstalled || '';
-  document.getElementById('carouselRemoved').value   = d.carouselRemoved   || '';
-  document.querySelectorAll('input[name="machine"]').forEach(r => r.checked = (r.value === d.machine));
-  (d.pos||[]).forEach((v,i)=>{ const el=document.getElementById(`pos${i+1}`); if(el) el.value=v||''; });
-  (d.foils||[]).forEach((f,i)=>{
-    if(i>=5) return; f=f||{};
-    document.getElementById(`f${i}_sd`).value = f.startDate||'';
-    tpSetValue(`f${i}_st`, f.startTime||'');
-    document.getElementById(`f${i}_sr`).value = f.startRun ||'';
-    document.getElementById(`f${i}_so`).value = f.startOp  ||'';
-    document.getElementById(`f${i}_ed`).value = f.endDate  ||'';
-    tpSetValue(`f${i}_et`, f.endTime||'');
-    document.getElementById(`f${i}_er`).value = f.endRun   ||'';
-    document.getElementById(`f${i}_eo`).value = f.endOp    ||'';
-    document.getElementById(`f${i}_td`).value = f.totalDose||'';
-    document.getElementById(`f${i}_rc`).value = f.reason   ||'';
+  document.getElementById('carouselRemoved').value = d.carouselRemoved || '';
+
+  document.querySelectorAll('input[name="machine"]').forEach(r => {
+    r.checked = (r.value === d.machine);
+  });
+
+  (d.pos || []).forEach((v, i) => {
+    const el = document.getElementById(`pos${i + 1}`);
+    if (el) el.value = v || '';
+  });
+
+  (d.foils || []).forEach((f, i) => {
+    if (i >= 5) return;
+    f = f || {};
+    document.getElementById(`f${i}_sd`).value = f.startDate || '';
+    tpSetValue(`f${i}_st`, f.startTime || '');
+    document.getElementById(`f${i}_sr`).value = f.startRun || '';
+    document.getElementById(`f${i}_so`).value = f.startOp || '';
+    document.getElementById(`f${i}_ed`).value = f.endDate || '';
+    tpSetValue(`f${i}_et`, f.endTime || '');
+    document.getElementById(`f${i}_er`).value = f.endRun || '';
+    document.getElementById(`f${i}_eo`).value = f.endOp || '';
+    document.getElementById(`f${i}_td`).value = f.totalDose || '';
+    document.getElementById(`f${i}_rc`).value = f.reason || '';
   });
 }
 
 function readForm() {
-  const foils=[];
-  for(let i=0;i<5;i++){
+  const foils = [];
+  for (let i = 0; i < 5; i++) {
     foils.push({
       startDate: document.getElementById(`f${i}_sd`).value,
       startTime: tpGetValue(`f${i}_st`),
-      startRun:  document.getElementById(`f${i}_sr`).value,
-      startOp:   document.getElementById(`f${i}_so`).value,
-      endDate:   document.getElementById(`f${i}_ed`).value,
-      endTime:   tpGetValue(`f${i}_et`),
-      endRun:    document.getElementById(`f${i}_er`).value,
-      endOp:     document.getElementById(`f${i}_eo`).value,
+      startRun: document.getElementById(`f${i}_sr`).value,
+      startOp: document.getElementById(`f${i}_so`).value,
+      endDate: document.getElementById(`f${i}_ed`).value,
+      endTime: tpGetValue(`f${i}_et`),
+      endRun: document.getElementById(`f${i}_er`).value,
+      endOp: document.getElementById(`f${i}_eo`).value,
       totalDose: document.getElementById(`f${i}_td`).value,
-      reason:    document.getElementById(`f${i}_rc`).value,
+      reason: document.getElementById(`f${i}_rc`).value,
     });
   }
+
   const machEl = document.querySelector('input[name="machine"]:checked');
+
   return {
-    totalThickness:    document.getElementById('totalThickness').value,
-    lotNumber:         document.getElementById('lotNumber').value,
-    ovenTemp:          document.getElementById('ovenTemp').value,
-    otherSpec:         document.getElementById('otherSpec').value,
+    totalThickness: document.getElementById('totalThickness').value,
+    lotNumber: document.getElementById('lotNumber').value,
+    ovenTemp: document.getElementById('ovenTemp').value,
+    otherSpec: document.getElementById('otherSpec').value,
     carouselInstalled: document.getElementById('carouselInstalled').value,
-    carouselRemoved:   document.getElementById('carouselRemoved').value,
+    carouselRemoved: document.getElementById('carouselRemoved').value,
     machine: machEl ? machEl.value : '',
-    pos: [1,2,3,4,5].map(n=>document.getElementById(`pos${n}`).value),
-    foils, savedAt: new Date().toISOString(), epr: currentEPR
+    pos: [1, 2, 3, 4, 5].map(n => document.getElementById(`pos${n}`).value),
+    foils,
+    savedAt: new Date().toISOString(),
+    epr: currentEPR
   };
 }
 
 // ── Time Picker ────────────────────────────────────────────
-const _tpCallbacks = {}; // id -> callback function
+const _tpCallbacks = {};
 const _tpHour = {};
 
 function tpHTML(id, callbackKey) {
-  const hrs  = Array.from({length:24}, (_,h) =>
-    `<div class="tp-cell" data-h="${h}" onclick="tpSelectHour('${id}',${h})">${String(h).padStart(2,'0')}</div>`
+  const hrs = Array.from({ length: 24 }, (_, h) =>
+    `<div class="tp-cell" data-h="${h}" onclick="tpSelectHour('${id}',${h})">${String(h).padStart(2, '0')}</div>`
   ).join('');
-  const mins = Array.from({length:60}, (_,m) =>
-    `<div class="tp-cell" data-m="${m}" onclick="tpSelectMin('${id}',${m},'${callbackKey}')">${String(m).padStart(2,'0')}</div>`
+
+  const mins = Array.from({ length: 60 }, (_, m) =>
+    `<div class="tp-cell" data-m="${m}" onclick="tpSelectMin('${id}',${m},'${callbackKey}')">${String(m).padStart(2, '0')}</div>`
   ).join('');
+
   return `
     <div class="tp-wrap" id="tp_${id}">
       <input type="hidden" id="${id}" value="">
@@ -632,10 +959,17 @@ function tpOpen(id) {
   document.querySelectorAll('.tp-popup.open').forEach(p => {
     if (p.id !== `tp_${id}_pop`) p.classList.remove('open');
   });
+
   const pop = document.getElementById(`tp_${id}_pop`);
   if (!pop) return;
-  if (pop.classList.contains('open')) { pop.classList.remove('open'); return; }
+
+  if (pop.classList.contains('open')) {
+    pop.classList.remove('open');
+    return;
+  }
+
   pop.classList.add('open');
+
   const cur = document.getElementById(id).value;
   if (cur) {
     const [h, m] = cur.split(':').map(Number);
@@ -647,13 +981,16 @@ function tpOpen(id) {
 function tpSelectHour(id, h) {
   _tpHour[id] = h;
   const hgrid = document.getElementById(`tp_${id}_hgrid`);
-  if (hgrid) hgrid.querySelectorAll('.tp-cell').forEach(c =>
-    c.classList.toggle('selected', +c.dataset.h === h));
+  if (hgrid) {
+    hgrid.querySelectorAll('.tp-cell').forEach(c =>
+      c.classList.toggle('selected', +c.dataset.h === h)
+    );
+  }
 }
 
 function tpSelectMin(id, m, callbackKey) {
-  const h   = (_tpHour[id] !== undefined) ? _tpHour[id] : 0;
-  const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  const h = (_tpHour[id] !== undefined) ? _tpHour[id] : 0;
+  const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
   document.getElementById(id).value = val;
   const btn = document.getElementById(`tp_${id}_btn`);
@@ -671,22 +1008,31 @@ function tpSelectMin(id, m, callbackKey) {
 function tpHighlight(id, h, m) {
   const hgrid = document.getElementById(`tp_${id}_hgrid`);
   const mgrid = document.getElementById(`tp_${id}_mgrid`);
-  if (hgrid) hgrid.querySelectorAll('.tp-cell').forEach(c =>
-    c.classList.toggle('selected', +c.dataset.h === h));
-  if (mgrid) mgrid.querySelectorAll('.tp-cell').forEach(c =>
-    c.classList.toggle('selected', +c.dataset.m === m));
+
+  if (hgrid) {
+    hgrid.querySelectorAll('.tp-cell').forEach(c =>
+      c.classList.toggle('selected', +c.dataset.h === h)
+    );
+  }
+
+  if (mgrid) {
+    mgrid.querySelectorAll('.tp-cell').forEach(c =>
+      c.classList.toggle('selected', +c.dataset.m === m)
+    );
+  }
 }
 
 function tpSetValue(id, val) {
   const hidden = document.getElementById(id);
-  const btn    = document.getElementById(`tp_${id}_btn`);
+  const btn = document.getElementById(`tp_${id}_btn`);
   if (!hidden || !btn) return;
+
   if (val) {
     hidden.value = val;
     btn.textContent = val;
     btn.classList.remove('empty');
     btn.classList.add('has-value');
-    const [h, m] = val.split(':').map(Number);
+    const [h] = val.split(':').map(Number);
     _tpHour[id] = h;
   } else {
     hidden.value = '';
@@ -712,7 +1058,8 @@ function autoFillNextRun(i) {
   autosave();
   const next = i + 1;
   if (next >= 5) return;
-  const endRun      = document.getElementById(`f${i}_er`).value;
+
+  const endRun = document.getElementById(`f${i}_er`).value;
   const nextStartRun = document.getElementById(`f${next}_sr`);
   if (!nextStartRun.value && endRun) nextStartRun.value = endRun;
 }
@@ -721,11 +1068,14 @@ function onEndDateTimeChange(i) {
   autosave();
   const next = i + 1;
   if (next >= 5) return;
+
   const endDate = document.getElementById(`f${i}_ed`).value;
   const endTime = tpGetValue(`f${i}_et`);
   const nextStartDate = document.getElementById(`f${next}_sd`);
+
   if (!nextStartDate.value && endDate) nextStartDate.value = endDate;
   if (!tpGetValue(`f${next}_st`) && endTime) tpSetValue(`f${next}_st`, endTime);
+
   autosave();
 }
 
@@ -745,33 +1095,32 @@ function startEdit() {
 
 function cancelEdit() {
   isEditing = false;
-  loadForm(getPageData(viewIndex)); // restore original
+  loadForm(getPageData(viewIndex));
   applyViewState();
   showToast('Edit cancelled.');
 }
 
 function saveEdit() {
-  const pages    = getPages(currentEPR);
+  const pages = getPages(currentEPR);
   const savedIdx = pages.length - viewIndex;
-  const updated  = readForm();
-  updated.pageNumber  = pages[savedIdx].pageNumber;
-  updated.savedAt     = pages[savedIdx].savedAt;     // keep original save date
-  updated.editedAt    = new Date().toISOString();     // stamp the edit time
-  pages[savedIdx]     = updated;
+  const updated = readForm();
+
+  updated.pageNumber = pages[savedIdx].pageNumber;
+  updated.savedAt = pages[savedIdx].savedAt;
+  updated.editedAt = new Date().toISOString();
+
+  pages[savedIdx] = updated;
   setPages(currentEPR, pages);
   isEditing = false;
   applyViewState();
   showToast('Record updated successfully.');
 }
 
-// ── Page data for a given viewIndex ───────────────────────
-// viewIndex 0 = draft (current editable)
-// viewIndex 1 = most recently saved page
-// viewIndex 2 = second most recent, etc.
+// ── Page data ──────────────────────────────────────────────
 function getPageData(idx) {
-  if(idx === 0) return ls_get(KEYS[currentEPR].draft) || emptyForm();
+  if (idx === 0) return ls_get(KEYS[currentEPR].draft) || emptyForm();
   const pages = getPages(currentEPR);
-  const savedIdx = pages.length - idx; // reverse order
+  const savedIdx = pages.length - idx;
   return pages[savedIdx] || emptyForm();
 }
 
@@ -781,27 +1130,24 @@ function totalPageCount() {
 
 function applyViewState() {
   const isReadOnly = viewIndex !== 0 && !isEditing;
-  const sheet      = document.getElementById('formSheet');
-  const banner     = document.getElementById('roBanner');
-  const roBadge    = document.getElementById('roBadge');
-  const total      = totalPageCount();
+  const sheet = document.getElementById('formSheet');
+  const banner = document.getElementById('roBanner');
+  const roBadge = document.getElementById('roBadge');
+  const total = totalPageCount();
 
-  // Read-only styling
   sheet.classList.toggle('readonly', isReadOnly);
   banner.classList.toggle('show', isReadOnly);
   roBadge.classList.toggle('show', isReadOnly && !isEditing);
 
-  // Button visibility
   const isSavedPage = viewIndex !== 0;
-  document.getElementById('btnSave').style.display       = (!isSavedPage)                  ? '' : 'none';
-  document.getElementById('btnNew').style.display        = (!isSavedPage)                  ? '' : 'none';
-  document.getElementById('btnReprint').style.display    = (isSavedPage && !isEditing)     ? '' : 'none';
-  document.getElementById('btnDelete').style.display     = (isSavedPage && !isEditing)     ? '' : 'none';
-  document.getElementById('btnEdit').style.display       = (isSavedPage && !isEditing)     ? '' : 'none';
-  document.getElementById('btnSaveEdit').style.display   = (isSavedPage &&  isEditing)     ? '' : 'none';
-  document.getElementById('btnCancelEdit').style.display = (isSavedPage &&  isEditing)     ? '' : 'none';
+  document.getElementById('btnSave').style.display = (!isSavedPage) ? '' : 'none';
+  document.getElementById('btnNew').style.display = (!isSavedPage) ? '' : 'none';
+  document.getElementById('btnReprint').style.display = (isSavedPage && !isEditing) ? '' : 'none';
+  document.getElementById('btnDelete').style.display = (isSavedPage && !isEditing) ? '' : 'none';
+  document.getElementById('btnEdit').style.display = (isSavedPage && !isEditing) ? '' : 'none';
+  document.getElementById('btnSaveEdit').style.display = (isSavedPage && isEditing) ? '' : 'none';
+  document.getElementById('btnCancelEdit').style.display = (isSavedPage && isEditing) ? '' : 'none';
 
-  // Banner text
   if (isEditing) {
     banner.textContent = '✏️ Editing Saved Record — click Save Changes when done';
     banner.style.background = 'linear-gradient(135deg, #0e2a1e, #163d28)';
@@ -815,136 +1161,220 @@ function applyViewState() {
     banner.style.color = '';
   }
 
-  // Nav info
   const displayPage = total - viewIndex;
   document.getElementById('navInfo').textContent = `Page ${displayPage} of ${total}`;
   document.getElementById('formFooter').textContent = `Page ${displayPage} of ${total}`;
 
-  // Jump to front
   document.getElementById('btnJump').style.display = viewIndex > 0 ? '' : 'none';
 
-  // Arrow states — disable nav while editing
   document.getElementById('btnPrev').disabled = (viewIndex === 0) || isEditing;
   document.getElementById('btnNext').disabled = (viewIndex >= total - 1) || isEditing;
 
-  // Page stack ghosts
   const pagesAhead = total - viewIndex - 1;
   document.querySelector('.page-ghost-1').style.display = pagesAhead >= 1 ? '' : 'none';
   document.querySelector('.page-ghost-2').style.display = pagesAhead >= 2 ? '' : 'none';
   document.querySelector('.page-ghost-3').style.display = pagesAhead >= 3 ? '' : 'none';
 }
 
-// ── Two-panel page flip ────────────────────────────────────
+// ── Improved page flip ─────────────────────────────────────
 function flipPage(dir, callback) {
   isEditing = false;
 
-  const form     = document.getElementById('formSheet');
-  const flipper  = document.getElementById('flipper');
-  const front    = document.getElementById('flip-front');
-  const back     = document.getElementById('flip-back');
+  const form = document.getElementById('formSheet');
+  const flipper = document.getElementById('flipper');
+  const front = document.getElementById('flip-front');
+  const back = document.getElementById('flip-back');
   const backShad = document.getElementById('flip-back-shadow');
   const underlay = document.getElementById('flip-underlay-shadow');
+  const curve = document.getElementById('flip-curve');
 
   const isForward = dir > 0;
-  const origin    = isForward ? 'left center' : 'right center';
-  const endAngle  = isForward ? -180 : 180;
+  const origin = isForward ? 'left center' : 'right center';
+  const endAngle = isForward ? -180 : 180;
 
-  // Size flipper to match current form height
   const h = form.offsetHeight;
-  flipper.style.height         = h + 'px';
-  underlay.style.height        = h + 'px';
-  front.style.height           = h + 'px';
-  back.style.height            = h + 'px';
-  backShad.style.height        = h + 'px';
+  flipper.style.height = h + 'px';
+  front.style.height = h + 'px';
+  back.style.height = h + 'px';
+  backShad.style.height = h + 'px';
+  underlay.style.height = h + 'px';
+  curve.style.height = h + 'px';
+  curve.style.width = '760px';
 
-  // Direction-specific shadow on back face (dark at spine/fold)
   backShad.style.background = isForward
-    ? 'linear-gradient(to right, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 30%, transparent 70%)'
-    : 'linear-gradient(to left,  rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 30%, transparent 70%)';
+    ? 'linear-gradient(to right, rgba(0,0,0,.58) 0%, rgba(0,0,0,.26) 18%, rgba(0,0,0,.10) 38%, transparent 70%)'
+    : 'linear-gradient(to left, rgba(0,0,0,.58) 0%, rgba(0,0,0,.26) 18%, rgba(0,0,0,.10) 38%, transparent 70%)';
 
-  // Shadow that falls on the page below as the leaf passes over it
   underlay.style.background = isForward
-    ? 'linear-gradient(to right, transparent 0%, rgba(0,0,0,.22) 60%, rgba(0,0,0,.08) 100%)'
-    : 'linear-gradient(to left,  transparent 0%, rgba(0,0,0,.22) 60%, rgba(0,0,0,.08) 100%)';
+    ? 'linear-gradient(to right, rgba(0,0,0,.02) 0%, rgba(0,0,0,.08) 24%, rgba(0,0,0,.22) 52%, rgba(0,0,0,.10) 78%, transparent 100%)'
+    : 'linear-gradient(to left, rgba(0,0,0,.02) 0%, rgba(0,0,0,.08) 24%, rgba(0,0,0,.22) 52%, rgba(0,0,0,.10) 78%, transparent 100%)';
 
-  // Reset flipper
+  flipper.style.display = 'block';
+  underlay.style.display = 'block';
+  curve.style.display = 'block';
+
   flipper.style.transformOrigin = origin;
-  flipper.style.transform       = 'rotateY(0deg)';
-  flipper.style.transition      = 'none';
-  flipper.style.display         = 'block';
-  underlay.style.display        = 'block';
-  underlay.style.opacity        = '0';
+  flipper.style.transition = 'none';
+  flipper.style.transform = 'rotateY(0deg) translateZ(0px) scale(1)';
+  flipper.style.filter = 'brightness(1)';
 
-  // Load new content underneath while flipper covers the form
+  underlay.style.opacity = '0';
+  underlay.style.transform = 'translateX(0px) scaleX(1)';
+  curve.style.opacity = '0';
+  curve.style.transform = 'translateX(0px) scaleX(1)';
+
   callback();
 
-  // Kick off the flip after the browser has painted the reset state
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const dur = 680;
-    const ease = 'cubic-bezier(0.645, 0.045, 0.355, 1.000)'; // strong ease-in-out
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const dur = 900;
+      const ease = 'cubic-bezier(0.22, 0.70, 0.18, 1.00)';
 
-    flipper.style.transition  = `transform ${dur}ms ${ease}`;
-    flipper.style.transform   = `rotateY(${endAngle}deg)`;
+      flipper.style.transition = `
+        transform ${dur}ms ${ease},
+        filter ${dur}ms ${ease}
+      `;
 
-    // Underlay shadow fades in during first half, out during second half
-    underlay.style.transition = `opacity ${dur * 0.45}ms ease-in`;
-    underlay.style.opacity    = '0.85';
-    setTimeout(() => {
-      underlay.style.transition = `opacity ${dur * 0.45}ms ease-out`;
-      underlay.style.opacity    = '0';
-    }, dur * 0.5);
+      flipper.style.transform = `rotateY(${endAngle}deg) translateZ(8px) scale(1.003)`;
+      flipper.style.filter = 'brightness(1.02)';
 
-    // Cleanup when flip completes
-    setTimeout(() => {
-      flipper.style.display  = 'none';
-      flipper.style.transition = 'none';
-      flipper.style.transform  = '';
-      underlay.style.display   = 'none';
-    }, dur + 30);
-  }));
+      underlay.animate([
+        {
+          opacity: 0,
+          transform: isForward ? 'translateX(0px) scaleX(0.96)' : 'translateX(0px) scaleX(0.96)'
+        },
+        {
+          opacity: 0.95,
+          transform: isForward ? 'translateX(10px) scaleX(1.02)' : 'translateX(-10px) scaleX(1.02)',
+          offset: 0.35
+        },
+        {
+          opacity: 0.60,
+          transform: isForward ? 'translateX(18px) scaleX(1.04)' : 'translateX(-18px) scaleX(1.04)',
+          offset: 0.58
+        },
+        {
+          opacity: 0,
+          transform: isForward ? 'translateX(24px) scaleX(1.00)' : 'translateX(-24px) scaleX(1.00)'
+        }
+      ], {
+        duration: dur,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      });
+
+      curve.animate([
+        {
+          opacity: 0,
+          transform: isForward ? 'translateX(-4px) scaleX(.98)' : 'translateX(4px) scaleX(.98)'
+        },
+        {
+          opacity: 0.38,
+          transform: isForward ? 'translateX(10px) scaleX(1.03)' : 'translateX(-10px) scaleX(1.03)',
+          offset: 0.28
+        },
+        {
+          opacity: 0.28,
+          transform: isForward ? 'translateX(16px) scaleX(1.05)' : 'translateX(-16px) scaleX(1.05)',
+          offset: 0.56
+        },
+        {
+          opacity: 0,
+          transform: isForward ? 'translateX(22px) scaleX(1.00)' : 'translateX(-22px) scaleX(1.00)'
+        }
+      ], {
+        duration: dur,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      });
+
+      front.animate([
+        { transform: 'translateX(0px)', opacity: 1 },
+        {
+          transform: isForward ? 'translateX(2px)' : 'translateX(-2px)',
+          opacity: 1,
+          offset: 0.35
+        },
+        { transform: 'translateX(0px)', opacity: 1 }
+      ], {
+        duration: dur,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      });
+
+      setTimeout(() => {
+        flipper.style.display = 'none';
+        underlay.style.display = 'none';
+        curve.style.display = 'none';
+
+        flipper.style.transition = 'none';
+        flipper.style.transform = '';
+        flipper.style.filter = '';
+        underlay.style.opacity = '0';
+        underlay.style.transform = '';
+        curve.style.opacity = '0';
+        curve.style.transform = '';
+      }, dur + 40);
+    });
+  });
 }
 
-// ── Navigate ───────────────────────────────────────────────
+// ── Navigation ─────────────────────────────────────────────
 function navigate(dir) {
-  const total  = totalPageCount();
+  const total = totalPageCount();
   const newIdx = viewIndex + dir;
   if (newIdx < 0 || newIdx >= total) return;
   if (viewIndex === 0) ls_set(KEYS[currentEPR].draft, readForm());
-  flipPage(dir, () => { viewIndex = newIdx; loadForm(getPageData(viewIndex)); applyViewState(); });
+  flipPage(dir, () => {
+    viewIndex = newIdx;
+    loadForm(getPageData(viewIndex));
+    applyViewState();
+  });
 }
 
-// ── Switch EPR ─────────────────────────────────────────────
 function switchEPR(epr) {
   if (epr === currentEPR) return;
   if (viewIndex === 0) ls_set(KEYS[currentEPR].draft, readForm());
-  currentEPR = epr; viewIndex = 0;
-  document.getElementById('btn41').classList.toggle('active', epr===41);
-  document.getElementById('btn42').classList.toggle('active', epr===42);
+  currentEPR = epr;
+  viewIndex = 0;
+  document.getElementById('btn41').classList.toggle('active', epr === 41);
+  document.getElementById('btn42').classList.toggle('active', epr === 42);
   document.getElementById('extractorLabel').textContent = `EPR ${epr}`;
-  flipPage(1, () => { loadForm(getPageData(0)); applyViewState(); });
+  flipPage(1, () => {
+    loadForm(getPageData(0));
+    applyViewState();
+  });
 }
 
-// ── Delete current viewed page ─────────────────────────────
 function deleteCurrentPage() {
   if (viewIndex === 0) return;
-  const pages    = getPages(currentEPR);
+  const pages = getPages(currentEPR);
   const savedIdx = pages.length - viewIndex;
-  const pageNum  = pages[savedIdx]?.pageNumber || (savedIdx + 1);
+  const pageNum = pages[savedIdx]?.pageNumber || (savedIdx + 1);
   if (!confirm(`Delete Page ${pageNum} for EPR-${currentEPR}? This cannot be undone.`)) return;
   pages.splice(savedIdx, 1);
   setPages(currentEPR, pages);
   const newIdx = Math.min(viewIndex, totalPageCount() - 1);
-  flipPage(-1, () => { viewIndex = newIdx; loadForm(getPageData(viewIndex)); applyViewState(); showToast(`Page ${pageNum} deleted.`); });
+  flipPage(-1, () => {
+    viewIndex = newIdx;
+    loadForm(getPageData(viewIndex));
+    applyViewState();
+    showToast(`Page ${pageNum} deleted.`);
+  });
 }
 
-// ── Jump to Front ──────────────────────────────────────────
 function jumpToFront() {
   if (viewIndex === 0) return;
-  flipPage(-1, () => { viewIndex = 0; loadForm(getPageData(0)); applyViewState(); });
+  flipPage(-1, () => {
+    viewIndex = 0;
+    loadForm(getPageData(0));
+    applyViewState();
+  });
 }
+
 async function savePage() {
-  const data    = readForm();
-  const pages   = getPages(currentEPR);
+  const data = readForm();
+  const pages = getPages(currentEPR);
   const pageNum = pages.length + 1;
   data.pageNumber = pageNum;
   pages.push(data);
@@ -953,7 +1383,6 @@ async function savePage() {
 
   showToast(`Page ${pageNum} saved. Use "Save to PDF" in the print dialog.`);
 
-  // Print the filled form FIRST, then reset to blank after dialog closes
   setTimeout(() => {
     window.print();
     window.addEventListener('afterprint', function handler() {
@@ -965,10 +1394,10 @@ async function savePage() {
   }, 300);
 }
 
-// ── Print prep: replace inputs with plain text for reliable printing ──
+// ── Print prep ─────────────────────────────────────────────
 function prepareForPrint() {
   document.querySelectorAll('.form-sheet input[type="text"], .form-sheet input[type="hidden"]').forEach(inp => {
-    if (inp.closest('.tp-wrap')) return; // handled separately
+    if (inp.closest('.tp-wrap')) return;
     const span = document.createElement('span');
     span.className = 'print-val';
     span.textContent = inp.value || '';
@@ -977,7 +1406,7 @@ function prepareForPrint() {
     inp.parentNode.insertBefore(span, inp);
     inp.style.display = 'none';
   });
-  // Date inputs
+
   document.querySelectorAll('.form-sheet input[type="date"]').forEach(inp => {
     const span = document.createElement('span');
     span.className = 'print-val';
@@ -988,7 +1417,7 @@ function prepareForPrint() {
     inp.parentNode.insertBefore(span, inp);
     inp.style.display = 'none';
   });
-  // Time picker buttons
+
   document.querySelectorAll('.tp-btn').forEach(btn => {
     const span = document.createElement('span');
     span.className = 'print-val';
@@ -998,7 +1427,7 @@ function prepareForPrint() {
     btn.parentNode.insertBefore(span, btn);
     btn.style.display = 'none';
   });
-  // Radio buttons
+
   document.querySelectorAll('.form-sheet input[type="radio"]').forEach(r => {
     if (!r.closest('.mach-opt')) return;
     const lbl = r.closest('.mach-opt');
@@ -1015,19 +1444,21 @@ function restoreAfterPrint() {
 }
 
 window.addEventListener('beforeprint', prepareForPrint);
-window.addEventListener('afterprint',  restoreAfterPrint);
+window.addEventListener('afterprint', restoreAfterPrint);
 
-// ── Reprint current viewed page ────────────────────────────
+// ── Reprint / print ────────────────────────────────────────
 function reprintCurrent() {
   showToast('Opening print dialog...');
-  setTimeout(()=> window.print(), 400);
+  setTimeout(() => window.print(), 400);
 }
 
-function printForm() { window.print(); }
+function printForm() {
+  window.print();
+}
 
 // ── New Page ───────────────────────────────────────────────
 function newPage() {
-  if(!confirm('Start a new page? Unsaved data on this page will be lost.')) return;
+  if (!confirm('Start a new page? Unsaved data on this page will be lost.')) return;
   ls_del(KEYS[currentEPR].draft);
   viewIndex = 0;
   loadForm(emptyForm());
