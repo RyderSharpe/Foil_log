@@ -1263,8 +1263,9 @@ function loadForm(data) {
   document.getElementById('carouselInstalled').value = d.carouselInstalled || '';
   document.getElementById('carouselRemoved').value   = d.carouselRemoved   || '';
 
-  // Update form title to reflect active machine
+  // Update form title and extractor label to reflect active machine/EPR
   document.getElementById('formMachineLabel').textContent = `TR30-${currentMachine}`;
+  document.getElementById('extractorLabel').textContent   = `EPR ${currentEPR}`;
 
   (d.pos||[]).forEach((v,i)=>{ const el=document.getElementById(`pos${i+1}`); if(el) el.value=v||''; });
   (d.foils||[]).forEach((f,i)=>{
@@ -1560,7 +1561,8 @@ function flipPage(dir, callback) {
   const titleEl  = document.getElementById('formMachineLabel');
   const oldTitle = titleEl ? titleEl.textContent : '';
 
-  // 2. Load new content into the real form immediately (visible underneath)
+  // 2. Load new content into the real form invisibly, then snap visible
+  form.style.opacity = '0';
   callback();
 
   // Grab new title then restore old one — swap in after animation
@@ -1599,6 +1601,7 @@ function flipPage(dir, callback) {
   const end  = isForward ? -180 : 180;
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
+    setTimeout(() => { form.style.opacity = '1'; }, dur * 0.5);
     leaf.style.transition        = `transform ${dur}ms ${ease}`;
     leaf.style.transform         = `rotateY(${end}deg)`;
     spineShadow.style.transition = `opacity ${dur * 0.5}ms ease-in`;
@@ -1642,7 +1645,6 @@ async function switchMachine(m) {
   viewIndex = 0;
   document.getElementById('btnTR1').classList.toggle('active', m === 1);
   document.getElementById('btnTR2').classList.toggle('active', m === 2);
-  document.getElementById('formMachineLabel').textContent = `TR30-${m}`;
   document.getElementById('extractorLabel').textContent = `EPR ${currentEPR}`;
   await reloadAll();
   flipPage(1, () => { loadForm(getPageData(0)); applyViewState(); });
@@ -1656,7 +1658,6 @@ async function switchEPR(epr) {
   viewIndex  = 0;
   document.getElementById('btn41').classList.toggle('active', epr === 41);
   document.getElementById('btn42').classList.toggle('active', epr === 42);
-  document.getElementById('extractorLabel').textContent = `EPR ${epr}`;
   await reloadAll();
   flipPage(1, () => { loadForm(getPageData(0)); applyViewState(); });
 }
