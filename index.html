@@ -206,7 +206,9 @@
     border-top: 2px solid rgba(245,166,35,.3);
   }
 
-  .sheet.readonly input {
+  .sheet.readonly input,
+  .sheet.readonly .tp-btn,
+  .sheet.readonly .tp-wrap {
     pointer-events: none;
     opacity: .75;
   }
@@ -495,9 +497,9 @@
 
   <div class="nav-cluster">
     <button type="button" class="btn" id="prevPageBtn">&#8592;</button>
-    <span class="nav-info" id="navInfo">Draft</span>
+    <span class="nav-info" id="navInfo">In Progress</span>
     <button type="button" class="btn" id="nextPageBtn">&#8594;</button>
-    <button type="button" class="btn" id="jumpToDraftBtn" style="display:none;">Jump to Draft</button>
+    <button type="button" class="btn" id="jumpToDraftBtn" style="display:none;">Jump to In Progress</button>
   </div>
 
   <span class="ro-badge" id="roBadge">Read Only</span>
@@ -556,7 +558,7 @@
 
     <div id="foilsContainer"></div>
 
-    <div class="form-footer" id="formFooter">Draft</div>
+    <div class="form-footer" id="formFooter">In Progress</div>
   </div>
 </div>
 
@@ -1155,11 +1157,10 @@ function applyViewState() {
   document.getElementById('machineLabel').textContent   = `TR30-${activeMachine}`;
   document.getElementById('extractorLabel').textContent = `EPR ${activeExtractor}`;
 
-  // Draft is a separate state, not a numbered page.
-  // Only saved records get page numbers in the nav and footer.
+  // "In Progress" is the current unsaved form. Only saved records get page numbers.
   if (pageViewIndex === 0) {
-    document.getElementById('navInfo').textContent    = 'Draft';
-    document.getElementById('formFooter').textContent = 'Draft';
+    document.getElementById('navInfo').textContent    = 'In Progress';
+    document.getElementById('formFooter').textContent = 'In Progress';
   } else {
     const page  = savedPages[savedPages.length - pageViewIndex];
     const label = page?.pageNumber || pageViewIndex;
