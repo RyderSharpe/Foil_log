@@ -274,27 +274,6 @@
     background: rgba(245,166,35,.06);
   }
 
-  /* Native time input — simpler than a custom picker.
-     Note: display format varies by browser/OS, but the stored value
-     is always HH:MM in 24-hour format. */
-  input[type="time"] {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11.5px;
-    color: var(--ink);
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--rule);
-    padding: 1px 2px;
-    height: 22px;
-    width: 80px;
-    cursor: pointer;
-  }
-
-  input[type="time"]:focus {
-    outline: none;
-    border-bottom-color: var(--amber-dim);
-    background: rgba(245,166,35,.06);
-  }
 
   input[type="date"] {
     font-family: 'Courier Prime', monospace;
@@ -330,6 +309,88 @@
   }
 
   .foil-title { font-weight: 700; font-size: 12.5px; margin-bottom: 4px; }
+
+  /* Foil row sizing — keep all fields on one line */
+  .foil-lbl { min-width: 148px; flex-shrink: 0; }
+  .foil-date { width: 118px; border: none; border-bottom: 1px solid var(--rule); background: transparent; font-family: "Courier Prime", monospace; font-size: 11.5px; color: var(--ink); padding: 1px 2px; height: 22px; cursor: pointer; }
+  .foil-date:focus { outline: none; border-bottom-color: var(--amber-dim); background: rgba(245,166,35,.06); }
+  .foil-run { white-space: nowrap; }
+  .foil-op  { white-space: nowrap; }
+
+  /* Custom time picker */
+  .tp-wrap { position: relative; display: inline-block; }
+
+  .tp-btn {
+    font-family: 'Courier Prime', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 1px 3px;
+    height: 22px;
+    width: 52px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tp-btn.empty { color: #aaa; }
+  .tp-btn:hover, .tp-btn:focus {
+    outline: none;
+    border-bottom-color: var(--amber-dim);
+    background: rgba(245,166,35,.06);
+  }
+
+  .tp-popup {
+    display: none;
+    position: absolute;
+    top: 26px;
+    left: 0;
+    z-index: 999;
+    background: #1c1c1e;
+    border: 1px solid var(--amber-dim);
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.7);
+    user-select: none;
+    white-space: nowrap;
+  }
+  .tp-popup.open { display: flex; gap: 8px; }
+
+  .tp-col { display: flex; flex-direction: column; gap: 4px; }
+
+  .tp-col-hdr {
+    background: linear-gradient(180deg, #f5a623, #c07820);
+    color: #000;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 0;
+    border-radius: 3px;
+  }
+
+  .tp-grid { display: grid; gap: 2px; }
+  .tp-hr-grid { grid-template-columns: repeat(4, 28px); }
+  .tp-mn-grid { grid-template-columns: repeat(10, 24px); }
+
+  .tp-cell {
+    background: #252528;
+    color: #aaa8a0;
+    border: 1px solid #333338;
+    border-radius: 2px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    text-align: center;
+    padding: 3px 0;
+    cursor: pointer;
+  }
+  .tp-cell:hover { background: var(--amber-dim); color: #000; }
+  .tp-cell.selected {
+    background: linear-gradient(180deg, #f5a623, #c07820);
+    color: #000;
+    font-weight: 700;
+  }
 
   .form-footer {
     margin-top: 10px;
@@ -461,11 +522,6 @@
 
     <div class="doc-box">
       <div class="doc-title">Foil Performance Log (TR30) — <span id="machineLabel">TR30-1</span></div>
-      <div class="doc-meta">
-        <span>Document-217822</span>
-        <span>Release No. 1</span>
-        <span>Release Date: 2022-01-19</span>
-      </div>
     </div>
 
     <div class="section">
@@ -783,10 +839,8 @@ function showToast(message, isError = false) {
 
 /* ============================================================
    13. RENDER FOIL BLOCKS
-   Builds the 5 FOIL entry rows on startup. Uses native
-   input[type="time"] — simpler than a custom picker, and the
-   stored value is always HH:MM in 24-hour format regardless
-   of how the browser displays it.
+   Builds the 5 FOIL entry rows on startup. Uses a custom
+   time picker so the format is consistent across all browsers.
    ============================================================ */
 function renderFoilBlocks() {
   const container = document.getElementById('foilsContainer');
@@ -798,18 +852,18 @@ function renderFoilBlocks() {
     block.innerHTML = `
       <div class="foil-title">FOIL #${i + 1}</div>
       <div class="line">
-        <span class="lbl" style="min-width:152px;">Start Date and Time:</span>
-        <input id="foil${i}_startDate" type="date">
-        <input id="foil${i}_startTime" type="time" step="60">
-        <label>Run#: <input id="foil${i}_startRun" class="field w-sm" type="text"></label>
-        <label>Operator: <input id="foil${i}_startOp" class="field w-md" type="text"></label>
+        <span class="lbl foil-lbl">Start Date and Time:</span>
+        <input id="foil${i}_startDate" class="foil-date" type="date">
+        ${buildTimepicker(`foil${i}_startTime`)}
+        <label class="foil-run">Run#: <input id="foil${i}_startRun" class="field" style="width:60px;" type="text"></label>
+        <label class="foil-op">Operator: <input id="foil${i}_startOp" class="field" style="width:80px;" type="text"></label>
       </div>
       <div class="line">
-        <span class="lbl" style="min-width:152px;">End Date and Time:</span>
-        <input id="foil${i}_endDate" type="date">
-        <input id="foil${i}_endTime" type="time" step="60">
-        <label>Run#: <input id="foil${i}_endRun" class="field w-sm" type="text"></label>
-        <label>Operator: <input id="foil${i}_endOp" class="field w-md" type="text"></label>
+        <span class="lbl foil-lbl">End Date and Time:</span>
+        <input id="foil${i}_endDate" class="foil-date" type="date">
+        ${buildTimepicker(`foil${i}_endTime`)}
+        <label class="foil-run">Run#: <input id="foil${i}_endRun" class="field" style="width:60px;" type="text"></label>
+        <label class="foil-op">Operator: <input id="foil${i}_endOp" class="field" style="width:80px;" type="text"></label>
       </div>
       <div class="line">
         <span class="lbl" style="min-width:152px;">Total Dose:</span>
@@ -847,11 +901,11 @@ function loadForm(data) {
     if (i >= 5) return;
     foil = foil || {};
     document.getElementById(`foil${i}_startDate`).value = foil.startDate || '';
-    document.getElementById(`foil${i}_startTime`).value = foil.startTime || '';
+    tpSetValue(`foil${i}_startTime`, foil.startTime || '');
     document.getElementById(`foil${i}_startRun`).value  = foil.startRun  || '';
     document.getElementById(`foil${i}_startOp`).value   = foil.startOp   || '';
     document.getElementById(`foil${i}_endDate`).value   = foil.endDate   || '';
-    document.getElementById(`foil${i}_endTime`).value   = foil.endTime   || '';
+    tpSetValue(`foil${i}_endTime`,   foil.endTime   || '');
     document.getElementById(`foil${i}_endRun`).value    = foil.endRun    || '';
     document.getElementById(`foil${i}_endOp`).value     = foil.endOp     || '';
     document.getElementById(`foil${i}_totalDose`).value = foil.totalDose || '';
@@ -869,11 +923,11 @@ function readForm() {
   for (let i = 0; i < 5; i++) {
     foils.push({
       startDate: document.getElementById(`foil${i}_startDate`).value,
-      startTime: document.getElementById(`foil${i}_startTime`).value,
+      startTime: tpGetValue(`foil${i}_startTime`),
       startRun:  document.getElementById(`foil${i}_startRun`).value,
       startOp:   document.getElementById(`foil${i}_startOp`).value,
       endDate:   document.getElementById(`foil${i}_endDate`).value,
-      endTime:   document.getElementById(`foil${i}_endTime`).value,
+      endTime:   tpGetValue(`foil${i}_endTime`),
       endRun:    document.getElementById(`foil${i}_endRun`).value,
       endOp:     document.getElementById(`foil${i}_endOp`).value,
       totalDose: document.getElementById(`foil${i}_totalDose`).value,
@@ -918,6 +972,101 @@ function maybeCopyEndRunToNextFoil(index) {
   const endRun    = document.getElementById(`foil${index}_endRun`).value;
   const nextStart = document.getElementById(`foil${next}_startRun`);
   if (endRun && !nextStart.value) { nextStart.value = endRun; autosave(); }
+}
+
+
+/* ============================================================
+   16b. CUSTOM TIME PICKER
+   Renders an hour/minute grid that pops up when the time button
+   is clicked. Stored value is always HH:MM in 24-hour format.
+   ============================================================ */
+const tpHour = {}; // tracks the selected hour for each picker
+
+function buildTimepicker(id) {
+  const hours = Array.from({ length: 24 }, (_, h) =>
+    `<div class="tp-cell" data-h="${h}" data-id="${id}">${String(h).padStart(2,'0')}</div>`
+  ).join('');
+  const mins = Array.from({ length: 60 }, (_, m) =>
+    `<div class="tp-cell" data-m="${m}" data-id="${id}">${String(m).padStart(2,'0')}</div>`
+  ).join('');
+  return `
+    <div class="tp-wrap">
+      <button type="button" class="tp-btn empty" id="tp_${id}_btn">--:--</button>
+      <div class="tp-popup" id="tp_${id}_pop">
+        <div class="tp-col">
+          <div class="tp-col-hdr">Hour</div>
+          <div class="tp-grid tp-hr-grid">${hours}</div>
+        </div>
+        <div class="tp-col">
+          <div class="tp-col-hdr">Min</div>
+          <div class="tp-grid tp-mn-grid">${mins}</div>
+        </div>
+      </div>
+      <input type="hidden" id="${id}">
+    </div>`;
+}
+
+function tpSetValue(id, val) {
+  const btn    = document.getElementById(`tp_${id}_btn`);
+  const hidden = document.getElementById(id);
+  if (!btn || !hidden) return;
+  if (val) {
+    hidden.value = val;
+    btn.textContent = val;
+    btn.classList.remove('empty');
+    tpHour[id] = Number(val.split(':')[0]);
+  } else {
+    hidden.value = '';
+    btn.textContent = '--:--';
+    btn.classList.add('empty');
+  }
+}
+
+function tpGetValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function attachTimepickerListeners() {
+  document.addEventListener('click', function(e) {
+    // Toggle popup open/close on button click
+    const btn = e.target.closest('.tp-btn');
+    if (btn) {
+      const pop    = btn.parentElement.querySelector('.tp-popup');
+      const isOpen = pop.classList.contains('open');
+      document.querySelectorAll('.tp-popup.open').forEach(p => p.classList.remove('open'));
+      if (!isOpen) pop.classList.add('open');
+      return;
+    }
+    // Hour cell — store selected hour and highlight
+    if (e.target.classList.contains('tp-cell') && e.target.dataset.h !== undefined) {
+      const id = e.target.dataset.id;
+      tpHour[id] = Number(e.target.dataset.h);
+      e.target.closest('.tp-hr-grid').querySelectorAll('.tp-cell').forEach(c =>
+        c.classList.toggle('selected', c === e.target));
+      return;
+    }
+    // Minute cell — finalise the time value and close picker
+    if (e.target.classList.contains('tp-cell') && e.target.dataset.m !== undefined) {
+      const id  = e.target.dataset.id;
+      const h   = tpHour[id] !== undefined ? tpHour[id] : 0;
+      const m   = Number(e.target.dataset.m);
+      const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      tpSetValue(id, val);
+      e.target.closest('.tp-mn-grid').querySelectorAll('.tp-cell').forEach(c =>
+        c.classList.toggle('selected', c === e.target));
+      e.target.closest('.tp-popup').classList.remove('open');
+      autosave();
+      // If this is an end time, also try copying the end date to next foil
+      const match = id.match(/foil(\d)_endTime/);
+      if (match) maybeCopyEndDateToNextFoil(Number(match[1]));
+      return;
+    }
+    // Click anywhere else closes all open pickers
+    if (!e.target.closest('.tp-wrap')) {
+      document.querySelectorAll('.tp-popup.open').forEach(p => p.classList.remove('open'));
+    }
+  });
 }
 
 
@@ -1150,7 +1299,7 @@ async function savePage() {
    then restores them after.
    ============================================================ */
 function prepareForPrint() {
-  const selectors = '.sheet input[type="text"], .sheet input[type="date"], .sheet input[type="time"]';
+  const selectors = '.sheet input[type="text"], .sheet input[type="date"]';
   document.querySelectorAll(selectors).forEach(input => {
     const span = document.createElement('span');
     span.className = 'print-val';
@@ -1159,6 +1308,17 @@ function prepareForPrint() {
     input.dataset.printReplace = '1';
     input.parentNode.insertBefore(span, input);
     input.style.display = 'none';
+  });
+
+  // Replace time picker buttons with plain text spans
+  document.querySelectorAll('.sheet .tp-btn').forEach(btn => {
+    const span = document.createElement('span');
+    span.className = 'print-val';
+    span.textContent = btn.textContent || '--:--';
+    span.style.cssText = 'font-family:Courier Prime,monospace;font-size:inherit;border-bottom:1px solid #999;display:inline-block;min-width:52px;';
+    btn.dataset.printReplace = '1';
+    btn.parentNode.insertBefore(span, btn);
+    btn.style.display = 'none';
   });
 }
 
@@ -1224,7 +1384,7 @@ function attachEventListeners() {
   // Foil block fields (wired after renderFoilBlocks creates them)
   for (let i = 0; i < 5; i++) {
     const foilTextFields = [`foil${i}_startRun`, `foil${i}_startOp`, `foil${i}_endRun`, `foil${i}_endOp`, `foil${i}_totalDose`, `foil${i}_reason`];
-    const foilDateFields = [`foil${i}_startDate`, `foil${i}_startTime`, `foil${i}_endDate`, `foil${i}_endTime`];
+    const foilDateFields = [`foil${i}_startDate`, `foil${i}_endDate`];
     foilTextFields.forEach(id => document.getElementById(id).addEventListener('input', autosave));
     foilDateFields.forEach(id => document.getElementById(id).addEventListener('change', autosave));
 
@@ -1232,6 +1392,9 @@ function attachEventListeners() {
     document.getElementById(`foil${i}_endDate`).addEventListener('change', () => maybeCopyEndDateToNextFoil(i));
     document.getElementById(`foil${i}_endRun`).addEventListener('change',  () => maybeCopyEndRunToNextFoil(i));
   }
+
+  // Time picker (event delegation — one listener handles all pickers)
+  attachTimepickerListeners();
 
   // Print hooks
   window.addEventListener('beforeprint', prepareForPrint);
