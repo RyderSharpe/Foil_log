@@ -1,3 +1,33 @@
+<!--
+  ================================================================
+  TR30 FOIL PERFORMANCE LOG
+  ================================================================
+  What this file is:
+    A single-file internal web app for filling out, saving, editing,
+    and printing TR30 foil performance log sheets. It replaces the
+    paper form.
+
+  Why it is still one file:
+    Intentionally easy to deploy. HTML, CSS, and JS are kept together.
+
+  How data is stored:
+    Primary:   foil-api.php on the company server (shared across computers)
+    Fallback:  Browser localStorage if the server is unreachable
+
+  Important offline note:
+    Local-only data does not automatically sync later. If the server is
+    down, work can continue, but that data stays on that browser only.
+
+  Setup:
+    Default SERVER_API_URL assumes this HTML file and foil-api.php are
+    in the same folder. Change it only if they are hosted separately.
+    Example: 'https://atgrecords.triumf.ca/foil-log/foil-api.php'
+
+  Fonts:
+    Loaded from Google Fonts (requires internet connection).
+    Courier Prime (form text) and Rajdhani (UI labels/buttons).
+  ================================================================
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,1301 +36,851 @@
 <title>Foil Performance Log – TR30</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script>
-/* turn.js 4.1.0 | Copyright (c) 2012 Emmanuel Garcia | turnjs.com | turnjs.com/license.txt */
-(function (f) {
-  function I(a, b, c) {
-    if (!c[0] || "object" == typeof c[0]) return b.init.apply(a, c);
-    if (b[c[0]]) return b[c[0]].apply(a, Array.prototype.slice.call(c, 1));
-    throw p(c[0] + " is not a method or property");
-  }
-  function l(a, b, c, d) {
-    return {
-      css: {
-        position: "absolute",
-        top: a,
-        left: b,
-        overflow: d || "hidden",
-        zIndex: c || "auto",
-      },
-    };
-  }
-  function R(a, b, c, d, e) {
-    var h = 1 - e,
-      f = h * h * h,
-      g = e * e * e;
-    return j(
-      Math.round(f * a.x + 3 * e * h * h * b.x + 3 * e * e * h * c.x + g * d.x),
-      Math.round(f * a.y + 3 * e * h * h * b.y + 3 * e * e * h * c.y + g * d.y)
-    );
-  }
-  function j(a, b) { return { x: a, y: b }; }
-  function E(a, b, c) {
-    return y && c
-      ? " translate3d(" + a + "px," + b + "px, 0px) "
-      : " translate(" + a + "px, " + b + "px) ";
-  }
-  function F(a) { return " rotate(" + a + "deg) "; }
-  function n(a, b) { return Object.prototype.hasOwnProperty.call(b, a); }
-  function S() {
-    for (var a = ["Moz", "Webkit", "Khtml", "O", "ms"], b = a.length, c = ""; b--;)
-      a[b] + "Transform" in document.body.style && (c = "-" + a[b].toLowerCase() + "-");
-    return c;
-  }
-  function O(a, b, c, d, e) {
-    var h, f = [];
-    if ("-webkit-" == v) {
-      for (h = 0; h < e; h++) f.push("color-stop(" + d[h][0] + ", " + d[h][1] + ")");
-      a.css({ "background-image": "-webkit-gradient(linear, " + b.x + "% " + b.y + "%," + c.x + "% " + c.y + "%, " + f.join(",") + " )" });
-    } else {
-      var b = { x: (b.x / 100) * a.width(), y: (b.y / 100) * a.height() },
-        c = { x: (c.x / 100) * a.width(), y: (c.y / 100) * a.height() },
-        g = c.x - b.x;
-      h = c.y - b.y;
-      var i = Math.atan2(h, g), w = i - Math.PI / 2,
-        w = Math.abs(a.width() * Math.sin(w)) + Math.abs(a.height() * Math.cos(w)),
-        g = Math.sqrt(h * h + g * g),
-        c = j(c.x < b.x ? a.width() : 0, c.y < b.y ? a.height() : 0),
-        k = Math.tan(i);
-      h = -1 / k;
-      k = (h * c.x - c.y - k * b.x + b.y) / (h - k);
-      c = h * k - h * c.x + c.y;
-      b = Math.sqrt(Math.pow(k - b.x, 2) + Math.pow(c - b.y, 2));
-      for (h = 0; h < e; h++) f.push(" " + d[h][1] + " " + (100 * (b + g * d[h][0])) / w + "%");
-      a.css({ "background-image": v + "linear-gradient(" + -i + "rad," + f.join(",") + ")" });
-    }
-  }
-  function s(a, b, c) {
-    a = f.Event(a); b.trigger(a, c);
-    return a.isDefaultPrevented() ? "prevented" : a.isPropagationStopped() ? "stopped" : "";
-  }
-  function p(a) {
-    function b(a) { this.name = "TurnJsError"; this.message = a; }
-    b.prototype = Error(); b.prototype.constructor = b;
-    return new b(a);
-  }
-  function C(a) {
-    var b = { top: 0, left: 0 };
-    do { b.left += a.offsetLeft; b.top += a.offsetTop; } while ((a = a.offsetParent));
-    return b;
-  }
-  var y, T, v = "", J = Math.PI, K = J / 2,
-    t = "ontouchstart" in window,
-    q = t ? { down: "touchstart", move: "touchmove", up: "touchend", over: "touchstart", out: "touchend" }
-          : { down: "mousedown", move: "mousemove", up: "mouseup", over: "mouseover", out: "mouseout" },
-    o = { backward: ["bl", "tl"], forward: ["br", "tr"], all: "tl bl tr br l r".split(" ") },
-    U = ["single", "double"], V = ["ltr", "rtl"],
-    W = { acceleration: !0, display: "double", duration: 600, page: 1, gradients: !0, turnCorners: "bl,br", when: null },
-    X = { cornerSize: 100 },
-    g = {
-      init: function (a) {
-        y = "WebKitCSSMatrix" in window || "MozPerspective" in document.body.style;
-        var b; T = (b = /AppleWebkit\/([0-9\.]+)/i.exec(navigator.userAgent)) ? 534.3 < parseFloat(b[1]) : !0;
-        v = S();
-        var c; b = 0;
-        var d = this.data(), e = this.children(),
-          a = f.extend({ width: this.width(), height: this.height(), direction: this.attr("dir") || this.css("direction") || "ltr" }, W, a);
-        d.opts = a; d.pageObjs = {}; d.pages = {}; d.pageWrap = {}; d.pageZoom = {}; d.pagePlace = {}; d.pageMv = []; d.zoom = 1;
-        d.totalPages = a.pages || 0;
-        d.eventHandlers = { touchStart: f.proxy(g._touchStart, this), touchMove: f.proxy(g._touchMove, this), touchEnd: f.proxy(g._touchEnd, this), start: f.proxy(g._eventStart, this) };
-        if (a.when) for (c in a.when) n(c, a.when) && this.bind(c, a.when[c]);
-        this.css({ position: "relative", width: a.width, height: a.height });
-        this.turn("display", a.display);
-        "" !== a.direction && this.turn("direction", a.direction);
-        y && !t && a.acceleration && this.transform(E(0, 0, !0));
-        for (c = 0; c < e.length; c++) "1" != f(e[c]).attr("ignore") && this.turn("addPage", e[c], ++b);
-        f(this).bind(q.down, d.eventHandlers.touchStart).bind("end", g._eventEnd).bind("pressed", g._eventPressed).bind("released", g._eventReleased).bind("flip", g._flip);
-        f(this).parent().bind("start", d.eventHandlers.start);
-        f(document).bind(q.move, d.eventHandlers.touchMove).bind(q.up, d.eventHandlers.touchEnd);
-        this.turn("page", a.page); d.done = !0; return this;
-      },
-      addPage: function (a, b) {
-        var c, d = !1, e = this.data(), h = e.totalPages + 1;
-        if (e.destroying) return !1;
-        if ((c = /\bp([0-9]+)\b/.exec(f(a).attr("class")))) b = parseInt(c[1], 10);
-        if (b) if (b == h) d = !0; else { if (b > h) throw p('Page "' + b + '" cannot be inserted'); } else { b = h; d = !0; }
-        1 <= b && b <= h && ((c = "double" == e.display ? (b % 2 ? " odd" : " even") : ""),
-          e.done && this.turn("stop"),
-          b in e.pageObjs && g._movePages.call(this, b, 1),
-          d && (e.totalPages = h),
-          (e.pageObjs[b] = f(a).css({ float: "left" }).addClass("page p" + b + c)),
-          g._addPage.call(this, b), g._removeFromDOM.call(this));
-        return this;
-      },
-      _addPage: function (a) {
-        var b = this.data(), c = b.pageObjs[a];
-        if (c) if (g._necessPage.call(this, a)) {
-          if (!b.pageWrap[a]) {
-            b.pageWrap[a] = f("<div/>", { class: "page-wrapper", page: a, css: { position: "absolute", overflow: "hidden" } });
-            this.append(b.pageWrap[a]);
-            b.pagePlace[a] || ((b.pagePlace[a] = a), b.pageObjs[a].appendTo(b.pageWrap[a]));
-            var d = g._pageSize.call(this, a, !0);
-            c.css({ width: d.width, height: d.height }); b.pageWrap[a].css(d);
-          }
-          b.pagePlace[a] == a && g._makeFlip.call(this, a);
-        } else { b.pagePlace[a] = 0; b.pageObjs[a] && b.pageObjs[a].remove(); }
-      },
-      hasPage: function (a) { return n(a, this.data().pageObjs); },
-      center: function (a) {
-        var b = this.data(), c = f(this).turn("size"), d = 0;
-        b.noCenter || ("double" == b.display && ((a = this.turn("view", a || b.tpage || b.page)),
-          "ltr" == b.direction ? a[0] ? a[1] || (d += c.width / 4) : (d -= c.width / 4)
-                               : a[0] ? a[1] || (d -= c.width / 4) : (d += c.width / 4)),
-          f(this).css({ marginLeft: d }));
-        return this;
-      },
-      destroy: function () {
-        var a = this, b = this.data(),
-          c = "end first flip last pressed released start turning turned zooming missing".split(" ");
-        if ("prevented" != s("destroying", this)) {
-          b.destroying = !0;
-          f.each(c, function (b, c) { a.unbind(c); });
-          this.parent().unbind("start", b.eventHandlers.start);
-          for (f(document).unbind(q.move, b.eventHandlers.touchMove).unbind(q.up, b.eventHandlers.touchEnd); 0 !== b.totalPages;)
-            this.turn("removePage", b.totalPages);
-          b.fparent && b.fparent.remove(); b.shadow && b.shadow.remove();
-          this.removeData(); b = null; return this;
-        }
-      },
-      is: function () { return "object" == typeof this.data().pages; },
-      zoom: function (a) {
-        var b = this.data();
-        if ("number" == typeof a) {
-          if (0.001 > a || 100 < a) throw p(a + " is not a value for zoom");
-          if ("prevented" == s("zooming", this, [a, b.zoom])) return this;
-          var c = this.turn("size"), d = this.turn("view"), e = 1 / b.zoom, h = Math.round(c.width * e * a), c = Math.round(c.height * e * a);
-          b.zoom = a; f(this).turn("stop").turn("size", h, c); b.opts.autoCenter && this.turn("center");
-          g._updateShadow.call(this);
-          for (a = 0; a < d.length; a++) d[a] && b.pageZoom[d[a]] != b.zoom && (this.trigger("zoomed", [d[a], d, b.pageZoom[d[a]], b.zoom]), (b.pageZoom[d[a]] = b.zoom));
-          return this;
-        }
-        return b.zoom;
-      },
-      _pageSize: function (a, b) {
-        var c = this.data(), d = {};
-        if ("single" == c.display) { d.width = this.width(); d.height = this.height(); b && (d.top = 0, d.left = 0, d.right = "auto"); }
-        else {
-          var e = this.width() / 2, h = this.height();
-          c.pageObjs[a].hasClass("own-size") ? (d.width = c.pageObjs[a].width(), d.height = c.pageObjs[a].height()) : (d.width = e, d.height = h);
-          if (b) { var f = a % 2; d.top = (h - d.height) / 2; "ltr" == c.direction ? (d[f ? "right" : "left"] = e - d.width, d[f ? "left" : "right"] = "auto") : (d[f ? "left" : "right"] = e - d.width, d[f ? "right" : "left"] = "auto"); }
-        }
-        return d;
-      },
-      _makeFlip: function (a) {
-        var b = this.data();
-        if (!b.pages[a] && b.pagePlace[a] == a) {
-          var c = "single" == b.display, d = a % 2;
-          b.pages[a] = b.pageObjs[a].css(g._pageSize.call(this, a)).flip({ page: a, next: d || c ? a + 1 : a - 1, turn: this }).flip("disable", b.disabled);
-          g._setPageLoc.call(this, a); b.pageZoom[a] = b.zoom;
-        }
-        return b.pages[a];
-      },
-      _makeRange: function () { var a, b; if (!(1 > this.data().totalPages)) { b = this.turn("range"); for (a = b[0]; a <= b[1]; a++) g._addPage.call(this, a); } },
-      range: function (a) {
-        var b, c, d, e = this.data(), a = a || e.tpage || e.page || 1;
-        d = g._view.call(this, a);
-        if (1 > a || a > e.totalPages) throw p('"' + a + '" is not a valid page');
-        d[1] = d[1] || d[0];
-        1 <= d[0] && d[1] <= e.totalPages ? ((a = Math.floor(2)), e.totalPages - d[1] > d[0] ? (b = Math.min(d[0] - 1, a), c = 2 * a - b) : (c = Math.min(e.totalPages - d[1], a), b = 2 * a - c)) : (c = b = 5);
-        return [Math.max(1, d[0] - b), Math.min(e.totalPages, d[1] + c)];
-      },
-      _necessPage: function (a) { if (0 === a) return !0; var b = this.turn("range"); return this.data().pageObjs[a].hasClass("fixed") || (a >= b[0] && a <= b[1]); },
-      _removeFromDOM: function () { var a, b = this.data(); for (a in b.pageWrap) n(a, b.pageWrap) && !g._necessPage.call(this, a) && g._removePageFromDOM.call(this, a); },
-      _removePageFromDOM: function (a) {
-        var b = this.data();
-        if (b.pages[a]) { var c = b.pages[a].data(); i._moveFoldingPage.call(b.pages[a], !1); c.f && c.f.fwrapper && c.f.fwrapper.remove(); b.pages[a].removeData(); b.pages[a].remove(); delete b.pages[a]; }
-        b.pageObjs[a] && b.pageObjs[a].remove();
-        b.pageWrap[a] && (b.pageWrap[a].remove(), delete b.pageWrap[a]);
-        g._removeMv.call(this, a); delete b.pagePlace[a]; delete b.pageZoom[a];
-      },
-      removePage: function (a) {
-        var b = this.data();
-        if ("*" == a) for (; 0 !== b.totalPages;) this.turn("removePage", b.totalPages);
-        else {
-          if (1 > a || a > b.totalPages) throw p("The page " + a + " doesn't exist");
-          b.pageObjs[a] && (this.turn("stop"), g._removePageFromDOM.call(this, a), delete b.pageObjs[a]);
-          g._movePages.call(this, a, -1); b.totalPages -= 1;
-          b.page > b.totalPages ? ((b.page = null), g._fitPage.call(this, b.totalPages)) : (g._makeRange.call(this), this.turn("update"));
-        }
-        return this;
-      },
-      _movePages: function (a, b) {
-        var c, d = this, e = this.data(), h = "single" == e.display,
-          f = function (a) {
-            var c = a + b, f = c % 2, i = f ? " odd " : " even ";
-            e.pageObjs[a] && (e.pageObjs[c] = e.pageObjs[a].removeClass("p" + a + " odd even").addClass("p" + c + i));
-            e.pagePlace[a] && e.pageWrap[a] && ((e.pagePlace[c] = c),
-              (e.pageWrap[c] = e.pageObjs[c].hasClass("fixed") ? e.pageWrap[a].attr("page", c) : e.pageWrap[a].css(g._pageSize.call(d, c, !0)).attr("page", c)),
-              e.pages[a] && (e.pages[c] = e.pages[a].flip("options", { page: c, next: h || f ? c + 1 : c - 1 })),
-              b && (delete e.pages[a], delete e.pagePlace[a], delete e.pageZoom[a], delete e.pageObjs[a], delete e.pageWrap[a]));
-          };
-        if (0 < b) for (c = e.totalPages; c >= a; c--) f(c); else for (c = a; c <= e.totalPages; c++) f(c);
-      },
-      display: function (a) {
-        var b = this.data(), c = b.display;
-        if (void 0 === a) return c;
-        if (-1 == f.inArray(a, U)) throw p('"' + a + '" is not a value for display');
-        switch (a) {
-          case "single": b.pageObjs[0] || (this.turn("stop").css({ overflow: "hidden" }), (b.pageObjs[0] = f("<div />", { class: "page p-temporal" }).css({ width: this.width(), height: this.height() }).appendTo(this))); this.addClass("shadow"); break;
-          case "double": b.pageObjs[0] && (this.turn("stop").css({ overflow: "" }), b.pageObjs[0].remove(), delete b.pageObjs[0]), this.removeClass("shadow");
-        }
-        b.display = a;
-        c && ((a = this.turn("size")), g._movePages.call(this, 1, 0), this.turn("size", a.width, a.height).turn("update"));
-        return this;
-      },
-      direction: function (a) {
-        var b = this.data();
-        if (void 0 === a) return b.direction;
-        a = a.toLowerCase();
-        if (-1 == f.inArray(a, V)) throw p('"' + a + '" is not a value for direction');
-        "rtl" == a && f(this).attr("dir", "ltr").css({ direction: "ltr" });
-        b.direction = a; b.done && this.turn("size", f(this).width(), f(this).height()); return this;
-      },
-      animating: function () { return 0 < this.data().pageMv.length; },
-      corner: function () { var a, b, c = this.data(); for (b in c.pages) if (n(b, c.pages) && (a = c.pages[b].flip("corner"))) return a; return !1; },
-      data: function () { return this.data(); },
-      disable: function (a) {
-        var b, c = this.data(), d = this.turn("view");
-        c.disabled = void 0 === a || !0 === a;
-        for (b in c.pages) n(b, c.pages) && c.pages[b].flip("disable", c.disabled ? !0 : -1 == f.inArray(parseInt(b, 10), d));
-        return this;
-      },
-      disabled: function (a) { return void 0 === a ? !0 === this.data().disabled : this.turn("disable", a); },
-      size: function (a, b) {
-        if (void 0 === a || void 0 === b) return { width: this.width(), height: this.height() };
-        this.turn("stop"); var c, d, e = this.data(); d = "double" == e.display ? a / 2 : a;
-        this.css({ width: a, height: b }); e.pageObjs[0] && e.pageObjs[0].css({ width: d, height: b });
-        for (c in e.pageWrap) n(c, e.pageWrap) && ((d = g._pageSize.call(this, c, !0)), e.pageObjs[c].css({ width: d.width, height: d.height }), e.pageWrap[c].css(d), e.pages[c] && e.pages[c].css({ width: d.width, height: d.height }));
-        this.turn("resize"); return this;
-      },
-      resize: function () {
-        var a, b = this.data();
-        b.pages[0] && (b.pageWrap[0].css({ left: -this.width() }), b.pages[0].flip("resize", !0));
-        for (a = 1; a <= b.totalPages; a++) b.pages[a] && b.pages[a].flip("resize", !0);
-        g._updateShadow.call(this); b.opts.autoCenter && this.turn("center");
-      },
-      _removeMv: function (a) { var b, c = this.data(); for (b = 0; b < c.pageMv.length; b++) if (c.pageMv[b] == a) return c.pageMv.splice(b, 1), !0; return !1; },
-      _addMv: function (a) { var b = this.data(); g._removeMv.call(this, a); b.pageMv.push(a); },
-      _view: function (a) { var b = this.data(), a = a || b.page; return "double" == b.display ? (a % 2 ? [a - 1, a] : [a, a + 1]) : [a]; },
-      view: function (a) {
-        var b = this.data(), a = g._view.call(this, a);
-        return "double" == b.display ? [0 < a[0] ? a[0] : 0, a[1] <= b.totalPages ? a[1] : 0] : [0 < a[0] && a[0] <= b.totalPages ? a[0] : 0];
-      },
-      stop: function (a, b) {
-        if (this.turn("animating")) {
-          var c, d, e, h = this.data();
-          h.tpage && (h.page = h.tpage, delete h.tpage);
-          for (c = 0; c < h.pageMv.length; c++) h.pageMv[c] && h.pageMv[c] !== a && ((e = h.pages[h.pageMv[c]]), (d = e.data().f.opts), e.flip("hideFoldedPage", b), b || i._moveFoldingPage.call(e, !1), d.force && (d.next = 0 === d.page % 2 ? d.page - 1 : d.page + 1, delete d.force));
-        }
-        this.turn("update"); return this;
-      },
-      pages: function (a) {
-        var b = this.data();
-        if (a) { if (a < b.totalPages) for (var c = b.totalPages; c > a; c--) this.turn("removePage", c); b.totalPages = a; g._fitPage.call(this, b.page); return this; }
-        return b.totalPages;
-      },
-      _missing: function (a) {
-        var b = this.data();
-        if (!(1 > b.totalPages)) { for (var c = this.turn("range", a), d = [], a = c[0]; a <= c[1]; a++) b.pageObjs[a] || d.push(a); 0 < d.length && this.trigger("missing", [d]); }
-      },
-      _fitPage: function (a) {
-        var b = this.data(), c = this.turn("view", a);
-        g._missing.call(this, a);
-        if (b.pageObjs[a]) {
-          b.page = a; this.turn("stop");
-          for (var d = 0; d < c.length; d++) c[d] && b.pageZoom[c[d]] != b.zoom && (this.trigger("zoomed", [c[d], c, b.pageZoom[c[d]], b.zoom]), (b.pageZoom[c[d]] = b.zoom));
-          g._removeFromDOM.call(this); g._makeRange.call(this); g._updateShadow.call(this);
-          this.trigger("turned", [a, c]); this.turn("update"); b.opts.autoCenter && this.turn("center");
-        }
-      },
-      _turnPage: function (a) {
-        var b, c, d = this.data(), e = d.pagePlace[a], h = this.turn("view"), i = this.turn("view", a);
-        if (d.page != a) {
-          var j = d.page;
-          if ("prevented" == s("turning", this, [a, i])) { j == d.page && -1 != f.inArray(e, d.pageMv) && d.pages[e].flip("hideFoldedPage", !0); return; }
-          -1 != f.inArray(1, i) && this.trigger("first");
-          -1 != f.inArray(d.totalPages, i) && this.trigger("last");
-        }
-        "single" == d.display ? (b = h[0], c = i[0]) : h[1] && a > h[1] ? (b = h[1], c = i[0]) : h[0] && a < h[0] && (b = h[0], c = i[1]);
-        e = d.opts.turnCorners.split(","); h = d.pages[b].data().f; i = h.opts; j = h.point;
-        g._missing.call(this, a);
-        d.pageObjs[a] && (this.turn("stop"), (d.page = a), g._makeRange.call(this), (d.tpage = c),
-          i.next != c && (i.next = c, i.force = !0), this.turn("update"), (h.point = j),
-          "hard" == h.effect ? "ltr" == d.direction ? d.pages[b].flip("turnPage", a > b ? "r" : "l") : d.pages[b].flip("turnPage", a > b ? "l" : "r")
-                             : "ltr" == d.direction ? d.pages[b].flip("turnPage", e[a > b ? 1 : 0]) : d.pages[b].flip("turnPage", e[a > b ? 0 : 1]));
-      },
-      page: function (a) {
-        var b = this.data();
-        if (void 0 === a) return b.page;
-        if (!b.disabled && !b.destroying) {
-          a = parseInt(a, 10);
-          if (0 < a && a <= b.totalPages) return (a != b.page && (!b.done || -1 != f.inArray(a, this.turn("view")) ? g._fitPage.call(this, a) : g._turnPage.call(this, a)), this);
-          throw p("The page " + a + " does not exist");
-        }
-      },
-      next: function () { return this.turn("page", Math.min(this.data().totalPages, g._view.call(this, this.data().page).pop() + 1)); },
-      previous: function () { return this.turn("page", Math.max(1, g._view.call(this, this.data().page).shift() - 1)); },
-      peel: function (a, b) {
-        var c = this.data(), d = this.turn("view"), b = void 0 === b ? !0 : !0 === b;
-        !1 === a ? this.turn("stop", null, b) : "single" == c.display ? c.pages[c.page].flip("peel", a, b)
-          : ((d = "ltr" == c.direction ? -1 != a.indexOf("l") ? d[0] : d[1] : -1 != a.indexOf("l") ? d[1] : d[0]), c.pages[d] && c.pages[d].flip("peel", a, b));
-        return this;
-      },
-      _addMotionPage: function () { var a = f(this).data().f.opts, b = a.turn; b.data(); g._addMv.call(b, a.page); },
-      _eventStart: function (a, b, c) {
-        var d = b.turn.data(), e = d.pageZoom[b.page];
-        a.isDefaultPrevented() || (e && e != d.zoom && (b.turn.trigger("zoomed", [b.page, b.turn.turn("view", b.page), e, d.zoom]), (d.pageZoom[b.page] = d.zoom)),
-          "single" == d.display && c && (("l" == c.charAt(1) && "ltr" == d.direction) || ("r" == c.charAt(1) && "rtl" == d.direction)
-            ? (b.next = b.next < b.page ? b.next : b.page - 1, b.force = !0) : (b.next = b.next > b.page ? b.next : b.page + 1)), g._addMotionPage.call(a.target));
-        g._updateShadow.call(b.turn);
-      },
-      _eventEnd: function (a, b, c) {
-        f(a.target).data(); var a = b.turn, d = a.data();
-        if (c) { if ((c = d.tpage || d.page), c == b.next || c == b.page) delete d.tpage, g._fitPage.call(a, c || b.next, !0); }
-        else g._removeMv.call(a, b.page), g._updateShadow.call(a), a.turn("update");
-      },
-      _eventPressed: function (a) { var a = f(a.target).data().f, b = a.opts.turn; b.data().mouseAction = !0; b.turn("update"); return (a.time = new Date().getTime()); },
-      _eventReleased: function (a, b) {
-        var c; c = f(a.target); var d = c.data().f, e = d.opts.turn, h = e.data();
-        c = "single" == h.display ? "br" == b.corner || "tr" == b.corner ? b.x < c.width() / 2 : b.x > c.width() / 2 : 0 > b.x || b.x > c.width();
-        if (200 > new Date().getTime() - d.time || c) a.preventDefault(), g._turnPage.call(e, d.opts.next);
-        h.mouseAction = !1;
-      },
-      _flip: function (a) { a.stopPropagation(); a = f(a.target).data().f.opts; a.turn.trigger("turn", [a.next]); a.turn.data().opts.autoCenter && a.turn.turn("center", a.next); },
-      _touchStart: function () { var a = this.data(), b; for (b in a.pages) if (n(b, a.pages) && !1 === i._eventStart.apply(a.pages[b], arguments)) return !1; },
-      _touchMove: function () { var a = this.data(), b; for (b in a.pages) n(b, a.pages) && i._eventMove.apply(a.pages[b], arguments); },
-      _touchEnd: function () { var a = this.data(), b; for (b in a.pages) n(b, a.pages) && i._eventEnd.apply(a.pages[b], arguments); },
-      calculateZ: function (a) {
-        var b, c, d, e, h = this, f = this.data(); b = this.turn("view"); var i = b[0] || b[1], g = a.length - 1, j = { pageZ: {}, partZ: {}, pageV: {} },
-          k = function (a) { a = h.turn("view", a); a[0] && (j.pageV[a[0]] = !0); a[1] && (j.pageV[a[1]] = !0); };
-        for (b = 0; b <= g; b++) (c = a[b]), (d = f.pages[c].data().f.opts.next), (e = f.pagePlace[c]), k(c), k(d),
-          (c = f.pagePlace[d] == d ? d : c), (j.pageZ[c] = f.totalPages - Math.abs(i - c)), (j.partZ[e] = 2 * f.totalPages - g + b);
-        return j;
-      },
-      update: function () {
-        var a, b = this.data();
-        if (this.turn("animating") && 0 !== b.pageMv[0]) {
-          var c, d = this.turn("calculateZ", b.pageMv), e = this.turn("corner"), h = this.turn("view"), i = this.turn("view", b.tpage);
-          for (a in b.pageWrap) if (n(a, b.pageWrap) && ((c = b.pageObjs[a].hasClass("fixed")),
-            b.pageWrap[a].css({ display: d.pageV[a] || c ? "" : "none", zIndex: (b.pageObjs[a].hasClass("hard") ? d.partZ[a] : d.pageZ[a]) || (c ? -1 : 0) }), (c = b.pages[a])))
-              c.flip("z", d.partZ[a] || null), d.pageV[a] && c.flip("resize"),
-                b.tpage ? c.flip("hover", !1).flip("disable", -1 == f.inArray(parseInt(a, 10), b.pageMv) && a != i[0] && a != i[1])
-                        : c.flip("hover", !1 === e).flip("disable", a != h[0] && a != h[1]);
-        } else for (a in b.pageWrap) n(a, b.pageWrap) && ((d = g._setPageLoc.call(this, a)), b.pages[a] && b.pages[a].flip("disable", b.disabled || 1 != d).flip("hover", !0).flip("z", null));
-        return this;
-      },
-      _updateShadow: function () {
-        var a, b, c = this.data(), d = this.width(), e = this.height(), h = "single" == c.display ? d : d / 2;
-        a = this.turn("view");
-        c.shadow || (c.shadow = f("<div />", { class: "shadow", css: l(0, 0, 0).css }).appendTo(this));
-        for (var i = 0; i < c.pageMv.length && a[0] && a[1]; i++)
-          (a = this.turn("view", c.pages[c.pageMv[i]].data().f.opts.next)), (b = this.turn("view", c.pageMv[i])), (a[0] = a[0] && b[0]), (a[1] = a[1] && b[1]);
-        switch (a[0] ? a[1] ? 3 : "ltr" == c.direction ? 2 : 1 : "ltr" == c.direction ? 1 : 2) {
-          case 1: c.shadow.css({ width: h, height: e, top: 0, left: h }); break;
-          case 2: c.shadow.css({ width: h, height: e, top: 0, left: 0 }); break;
-          case 3: c.shadow.css({ width: d, height: e, top: 0, left: 0 });
-        }
-      },
-      _setPageLoc: function (a) {
-        var b = this.data(), c = this.turn("view"), d = 0;
-        if (a == c[0] || a == c[1]) d = 1;
-        else if (("single" == b.display && a == c[0] + 1) || ("double" == b.display && a == c[0] - 2) || a == c[1] + 2) d = 2;
-        if (!this.turn("animating")) switch (d) {
-          case 1: b.pageWrap[a].css({ zIndex: b.totalPages, display: "" }); break;
-          case 2: b.pageWrap[a].css({ zIndex: b.totalPages - 1, display: "" }); break;
-          case 0: b.pageWrap[a].css({ zIndex: 0, display: b.pageObjs[a].hasClass("fixed") ? "" : "none" });
-        }
-        return d;
-      },
-      options: function (a) {
-        if (void 0 === a) return this.data().opts;
-        var b = this.data(); f.extend(b.opts, a);
-        a.pages && this.turn("pages", a.pages); a.page && this.turn("page", a.page);
-        a.display && this.turn("display", a.display); a.direction && this.turn("direction", a.direction);
-        a.width && a.height && this.turn("size", a.width, a.height);
-        if (a.when) for (var c in a.when) n(c, a.when) && this.unbind(c).bind(c, a.when[c]);
-        return this;
-      },
-      version: function () { return "4.1.0"; }
-    },
-    i = {
-      init: function (a) { this.data({ f: { disabled: !1, hover: !1, effect: this.hasClass("hard") ? "hard" : "sheet" } }); this.flip("options", a); i._addPageWrapper.call(this); return this; },
-      setData: function (a) { var b = this.data(); b.f = f.extend(b.f, a); return this; },
-      options: function (a) { var b = this.data().f; return a ? (i.setData.call(this, { opts: f.extend({}, b.opts || X, a) }), this) : b.opts; },
-      z: function (a) { var b = this.data().f; b.opts["z-index"] = a; b.fwrapper && b.fwrapper.css({ zIndex: a || parseInt(b.parent.css("z-index"), 10) || 0 }); return this; },
-      _cAllowed: function () {
-        var a = this.data().f, b = a.opts.page, c = a.opts.turn.data(), d = b % 2;
-        return "hard" == a.effect ? "ltr" == c.direction ? [d ? "r" : "l"] : [d ? "l" : "r"]
-          : "single" == c.display ? 1 == b ? "ltr" == c.direction ? o.forward : o.backward : b == c.totalPages ? "ltr" == c.direction ? o.backward : o.forward : o.all
-          : "ltr" == c.direction ? o[d ? "forward" : "backward"] : o[d ? "backward" : "forward"];
-      },
-      _cornerActivated: function (a) {
-        var b = this.data().f, c = this.width(), d = this.height(), a = { x: a.x, y: a.y, corner: "" }, e = b.opts.cornerSize;
-        if (0 >= a.x || 0 >= a.y || a.x >= c || a.y >= d) return !1;
-        var h = i._cAllowed.call(this);
-        switch (b.effect) {
-          case "hard": if (a.x > c - e) a.corner = "r"; else if (a.x < e) a.corner = "l"; else return !1; break;
-          case "sheet": if (a.y < e) a.corner += "t"; else if (a.y >= d - e) a.corner += "b"; else return !1; if (a.x <= e) a.corner += "l"; else if (a.x >= c - e) a.corner += "r"; else return !1;
-        }
-        return !a.corner || -1 == f.inArray(a.corner, h) ? !1 : a;
-      },
-      _isIArea: function (a) {
-        var b = this.data().f.parent.offset(), a = t && a.originalEvent ? a.originalEvent.touches[0] : a;
-        return i._cornerActivated.call(this, { x: a.pageX - b.left, y: a.pageY - b.top });
-      },
-      _c: function (a, b) {
-        b = b || 0;
-        switch (a) { case "tl": return j(b, b); case "tr": return j(this.width() - b, b); case "bl": return j(b, this.height() - b); case "br": return j(this.width() - b, this.height() - b); case "l": return j(b, 0); case "r": return j(this.width() - b, 0); }
-      },
-      _c2: function (a) {
-        switch (a) { case "tl": return j(2 * this.width(), 0); case "tr": return j(-this.width(), 0); case "bl": return j(2 * this.width(), this.height()); case "br": return j(-this.width(), this.height()); case "l": return j(2 * this.width(), 0); case "r": return j(-this.width(), 0); }
-      },
-      _foldingPage: function () {
-        var a = this.data().f;
-        if (a) { var b = a.opts; if (b.turn) return (a = b.turn.data()), "single" == a.display ? 1 < b.next || 1 < b.page ? a.pageObjs[0] : null : a.pageObjs[b.next]; }
-      },
-      _backGradient: function () {
-        var a = this.data().f, b = a.opts.turn.data();
-        if ((b = b.opts.gradients && ("single" == b.display || (2 != a.opts.page && a.opts.page != b.totalPages - 1))) && !a.bshadow)
-          a.bshadow = f("<div/>", l(0, 0, 1)).css({ position: "", width: this.width(), height: this.height() }).appendTo(a.parent);
-        return b;
-      },
-      type: function () { return this.data().f.effect; },
-      resize: function (a) {
-        var b = this.data().f, c = b.opts.turn.data(), d = this.width(), e = this.height();
-        switch (b.effect) {
-          case "hard": a && (b.wrapper.css({ width: d, height: e }), b.fpage.css({ width: d, height: e }), c.opts.gradients && (b.ashadow.css({ width: d, height: e }), b.bshadow.css({ width: d, height: e }))); break;
-          case "sheet": a && ((a = Math.round(Math.sqrt(Math.pow(d, 2) + Math.pow(e, 2)))), b.wrapper.css({ width: a, height: a }), b.fwrapper.css({ width: a, height: a }).children(":first-child").css({ width: d, height: e }), b.fpage.css({ width: d, height: e }), c.opts.gradients && b.ashadow.css({ width: d, height: e }), i._backGradient.call(this) && b.bshadow.css({ width: d, height: e })),
-            b.parent.is(":visible") && ((c = C(b.parent[0])), b.fwrapper.css({ top: c.top, left: c.left }), (c = C(b.opts.turn[0])), b.fparent.css({ top: -c.top, left: -c.left })),
-            this.flip("z", b.opts["z-index"]);
-        }
-      },
-      _addPageWrapper: function () {
-        var a = this.data().f, b = a.opts.turn.data(), c = this.parent();
-        a.parent = c;
-        if (!a.wrapper) switch (a.effect) {
-          case "hard":
-            var d = {}; d[v + "transform-style"] = "preserve-3d"; d[v + "backface-visibility"] = "hidden";
-            a.wrapper = f("<div/>", l(0, 0, 2)).css(d).appendTo(c).prepend(this);
-            a.fpage = f("<div/>", l(0, 0, 1)).css(d).appendTo(c);
-            b.opts.gradients && (a.ashadow = f("<div/>", l(0, 0, 0)).hide().appendTo(c), a.bshadow = f("<div/>", l(0, 0, 0)));
-            break;
-          case "sheet":
-            var d = this.width(), e = this.height(); Math.round(Math.sqrt(Math.pow(d, 2) + Math.pow(e, 2)));
-            a.fparent = a.opts.turn.data().fparent;
-            a.fparent || ((d = f("<div/>", { css: { "pointer-events": "none" } }).hide()), (d.data().flips = 0), d.css(l(0, 0, "auto", "visible").css).appendTo(a.opts.turn), (a.opts.turn.data().fparent = d), (a.fparent = d));
-            this.css({ position: "absolute", top: 0, left: 0, bottom: "auto", right: "auto" });
-            a.wrapper = f("<div/>", l(0, 0, this.css("z-index"))).appendTo(c).prepend(this);
-            a.fwrapper = f("<div/>", l(c.offset().top, c.offset().left)).hide().appendTo(a.fparent);
-            a.fpage = f("<div/>", l(0, 0, 0, "visible")).css({ cursor: "default" }).appendTo(a.fwrapper);
-            b.opts.gradients && (a.ashadow = f("<div/>", l(0, 0, 1)).appendTo(a.fpage));
-            i.setData.call(this, a);
-        }
-        i.resize.call(this, !0);
-      },
-      _fold: function (a) {
-        var b = this.data().f, c = b.opts.turn.data(), d = i._c.call(this, a.corner), e = this.width(), h = this.height();
-        switch (b.effect) {
-          case "hard":
-            a.x = "l" == a.corner ? Math.min(Math.max(a.x, 0), 2 * e) : Math.max(Math.min(a.x, e), -e);
-            var f, g, r, w, k, n = c.totalPages, l = b.opts["z-index"] || n, p = { overflow: "visible" },
-              o = d.x ? (d.x - a.x) / e : a.x / e, q = 90 * o, s = 90 > q;
-            switch (a.corner) {
-              case "l": w = "0% 50%"; k = "100% 50%"; s ? (f = 0, g = 0 < b.opts.next - 1, r = 1) : (f = "100%", g = b.opts.page + 1 < n, r = 0); break;
-              case "r": w = "100% 50%"; k = "0% 50%"; q = -q; e = -e; s ? (f = 0, g = b.opts.next + 1 < n, r = 0) : (f = "-100%", g = 1 != b.opts.page, r = 1);
-            }
-            p[v + "perspective-origin"] = k;
-            b.wrapper.transform("rotateY(" + q + "deg)translate3d(0px, 0px, " + (this.attr("depth") || 0) + "px)", k);
-            b.fpage.transform("translateX(" + e + "px) rotateY(" + (180 + q) + "deg)", w);
-            b.parent.css(p);
-            s ? (o = -o + 1, b.wrapper.css({ zIndex: l + 1 }), b.fpage.css({ zIndex: l })) : (o -= 1, b.wrapper.css({ zIndex: l }), b.fpage.css({ zIndex: l + 1 }));
-            c.opts.gradients && (g ? b.ashadow.css({ display: "", left: f, backgroundColor: "rgba(0,0,0," + 0.5 * o + ")" }).transform("rotateY(0deg)") : b.ashadow.hide(),
-              b.bshadow.css({ opacity: -o + 1 }),
-              s ? b.bshadow.parent()[0] != b.wrapper[0] && b.bshadow.appendTo(b.wrapper) : b.bshadow.parent()[0] != b.fpage[0] && b.bshadow.appendTo(b.fpage),
-              O(b.bshadow, j(100 * r, 0), j(100 * (-r + 1), 0), [[0, "rgba(0,0,0,0.3)"], [1, "rgba(0,0,0,0)"]], 2));
-            break;
-          case "sheet":
-            var t = this, G = 0, y, z, A, L, x, M, C, u = j(0, 0), P = j(0, 0), m = j(0, 0), I = i._foldingPage.call(this);
-            Math.tan(0);
-            var N = c.opts.acceleration, Q = b.wrapper.height(), D = "t" == a.corner.substr(0, 1), B = "l" == a.corner.substr(1, 1),
-              H = function () {
-                var b = j(0, 0), f = j(0, 0);
-                b.x = d.x ? d.x - a.x : a.x; b.y = T ? (d.y ? d.y - a.y : a.y) : 0;
-                f.x = B ? e - b.x / 2 : a.x + b.x / 2; f.y = b.y / 2;
-                var g = K - Math.atan2(b.y, b.x), k = g - Math.atan2(f.y, f.x),
-                  k = Math.max(0, Math.sin(k) * Math.sqrt(Math.pow(f.x, 2) + Math.pow(f.y, 2)));
-                G = 180 * (g / J); m = j(k * Math.sin(g), k * Math.cos(g));
-                if (g > K && ((m.x += Math.abs((m.y * b.y) / b.x)), (m.y = 0), Math.round(m.x * Math.tan(J - g)) < h))
-                  return (a.y = Math.sqrt(Math.pow(h, 2) + 2 * f.x * b.x)), D && (a.y = h - a.y), H();
-                if (g > K && ((b = J - g), (f = Q - h / Math.sin(b)), (u = j(Math.round(f * Math.cos(b)), Math.round(f * Math.sin(b)))), B && (u.x = -u.x), D)) u.y = -u.y;
-                y = Math.round(m.y / Math.tan(g) + m.x); b = e - y; f = b * Math.cos(2 * g); k = b * Math.sin(2 * g);
-                P = j(Math.round(B ? b - f : y + f), Math.round(D ? k : h - k));
-                if (c.opts.gradients && ((x = b * Math.sin(g)), (b = i._c2.call(t, a.corner)),
-                  (b = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2)) / e),
-                  (C = Math.sin(K * (1 < b ? 2 - b : b))), (M = Math.min(b, 1)),
-                  (L = 100 < x ? (x - 100) / x : 0),
-                  (z = j(100 * ((x * Math.sin(g)) / e), 100 * ((x * Math.cos(g)) / h))),
-                  i._backGradient.call(t) && ((A = j(100 * ((1.2 * x * Math.sin(g)) / e), 100 * ((1.2 * x * Math.cos(g)) / h))), B || (A.x = 100 - A.x), !D))) A.y = 100 - A.y;
-                m.x = Math.round(m.x); m.y = Math.round(m.y); return !0;
-              };
-            f = function (a, d, f, g) {
-              var k = ["0", "auto"], m = ((e - Q) * f[0]) / 100, l = ((h - Q) * f[1]) / 100,
-                d = { left: k[d[0]], top: k[d[1]], right: k[d[2]], bottom: k[d[3]] }, k = {},
-                n = 90 != g && -90 != g ? (B ? -1 : 1) : 0, r = f[0] + "% " + f[1] + "%";
-              t.css(d).transform(F(g) + E(a.x + n, a.y, N), r);
-              b.fpage.css(d).transform(F(g) + E(a.x + P.x - u.x - (e * f[0]) / 100, a.y + P.y - u.y - (h * f[1]) / 100, N) + F((180 / g - 2) * g), r);
-              b.wrapper.transform(E(-a.x + m - n, -a.y + l, N) + F(-g), r);
-              b.fwrapper.transform(E(-a.x + u.x + m, -a.y + u.y + l, N) + F(-g), r);
-              c.opts.gradients && (f[0] && (z.x = 100 - z.x), f[1] && (z.y = 100 - z.y),
-                (k["box-shadow"] = "0 0 20px rgba(0,0,0," + 0.5 * C + ")"), I.css(k),
-                O(b.ashadow, j(B ? 100 : 0, D ? 0 : 100), j(z.x, z.y), [[L, "rgba(0,0,0,0)"], [0.8 * (1 - L) + L, "rgba(0,0,0," + 0.2 * M + ")"], [1, "rgba(255,255,255," + 0.2 * M + ")"]], 3, 0),
-                i._backGradient.call(t) && O(b.bshadow, j(B ? 0 : 100, D ? 0 : 100), j(A.x, A.y), [[0.6, "rgba(0,0,0,0)"], [0.8, "rgba(0,0,0," + 0.3 * M + ")"], [1, "rgba(0,0,0,0)"]], 3));
-            };
-            switch (a.corner) {
-              case "tl": a.x = Math.max(a.x, 1); H(); f(m, [1, 0, 0, 1], [100, 0], G); break;
-              case "tr": a.x = Math.min(a.x, e - 1); H(); f(j(-m.x, m.y), [0, 0, 0, 1], [0, 0], -G); break;
-              case "bl": a.x = Math.max(a.x, 1); H(); f(j(m.x, -m.y), [1, 1, 0, 0], [100, 100], -G); break;
-              case "br": (a.x = Math.min(a.x, e - 1)), H(), f(j(-m.x, -m.y), [0, 1, 1, 0], [0, 100], G);
-            }
-        }
-        b.point = a;
-      },
-      _moveFoldingPage: function (a) {
-        var b = this.data().f;
-        if (b) {
-          var c = b.opts.turn, d = c.data(), e = d.pagePlace;
-          a ? ((d = b.opts.next), e[d] != b.opts.page && (b.folding && i._moveFoldingPage.call(this, !1), i._foldingPage.call(this).appendTo(b.fpage), (e[d] = b.opts.page), (b.folding = d)), c.turn("update"))
-            : b.folding && (d.pages[b.folding] ? ((c = d.pages[b.folding].data().f), d.pageObjs[b.folding].appendTo(c.wrapper)) : d.pageWrap[b.folding] && d.pageObjs[b.folding].appendTo(d.pageWrap[b.folding]),
-              b.folding in e && (e[b.folding] = b.folding), delete b.folding);
-        }
-      },
-      _showFoldedPage: function (a, b) {
-        var c = i._foldingPage.call(this), d = this.data(), e = d.f, f = e.visible;
-        if (c) {
-          if (!f || !e.point || e.point.corner != a.corner)
-            if ((c = "hover" == e.status || "peel" == e.status || e.opts.turn.data().mouseAction ? a.corner : null, f = !1, "prevented" == s("start", this, [e.opts, c]))) return !1;
-          if (b) { var g = this, d = e.point && e.point.corner == a.corner ? e.point : i._c.call(this, a.corner, 1); this.animatef({ from: [d.x, d.y], to: [a.x, a.y], duration: 500, frame: function (b) { a.x = Math.round(b[0]); a.y = Math.round(b[1]); i._fold.call(g, a); } }); }
-          else i._fold.call(this, a), d.effect && !d.effect.turning && this.animatef(!1);
-          if (!f) switch (e.effect) {
-            case "hard": e.visible = !0; i._moveFoldingPage.call(this, !0); e.fpage.show(); e.opts.shadows && e.bshadow.show(); break;
-            case "sheet": (e.visible = !0), e.fparent.show().data().flips++, i._moveFoldingPage.call(this, !0), e.fwrapper.show(), e.bshadow && e.bshadow.show();
-          }
-          return !0;
-        }
-        return !1;
-      },
-      hide: function () {
-        var a = this.data().f, b = a.opts.turn.data(), c = i._foldingPage.call(this);
-        switch (a.effect) {
-          case "hard": b.opts.gradients && (a.bshadowLoc = 0, a.bshadow.remove(), a.ashadow.hide()); a.wrapper.transform(""); a.fpage.hide(); break;
-          case "sheet": 0 === --a.fparent.data().flips && a.fparent.hide(), this.css({ left: 0, top: 0, right: "auto", bottom: "auto" }).transform(""), a.wrapper.transform(""), a.fwrapper.hide(), a.bshadow && a.bshadow.hide(), c.transform("");
-        }
-        a.visible = !1; return this;
-      },
-      hideFoldedPage: function (a) {
-        var b = this.data().f;
-        if (b.point) {
-          var c = this, d = b.point, e = function () { b.point = null; b.status = ""; c.flip("hide"); c.trigger("end", [b.opts, !1]); };
-          if (a) { var f = i._c.call(this, d.corner), a = "t" == d.corner.substr(0, 1) ? Math.min(0, d.y - f.y) / 2 : Math.max(0, d.y - f.y) / 2, g = j(d.x, d.y + a), l = j(f.x, f.y - a); this.animatef({ from: 0, to: 1, frame: function (a) { a = R(d, g, l, f, a); d.x = a.x; d.y = a.y; i._fold.call(c, d); }, complete: e, duration: 800, hiding: !0 }); }
-          else this.animatef(!1), e();
-        }
-      },
-      turnPage: function (a) {
-        var b = this, c = this.data().f, d = c.opts.turn.data(), a = { corner: c.corner ? c.corner.corner : a || i._cAllowed.call(this)[0] },
-          e = c.point || i._c.call(this, a.corner, c.opts.turn ? d.opts.elevation : 0), f = i._c2.call(this, a.corner);
-        this.trigger("flip").animatef({ from: 0, to: 1, frame: function (c) { c = R(e, e, f, f, c); a.x = c.x; a.y = c.y; i._showFoldedPage.call(b, a); }, complete: function () { b.trigger("end", [c.opts, !0]); }, duration: d.opts.duration, turning: !0 });
-        c.corner = null;
-      },
-      moving: function () { return "effect" in this.data(); },
-      isTurning: function () { return this.flip("moving") && this.data().effect.turning; },
-      corner: function () { return this.data().f.corner; },
-      _eventStart: function (a) {
-        var b = this.data().f, c = b.opts.turn;
-        if (!b.corner && !b.disabled && !this.flip("isTurning") && b.opts.page == c.data().pagePlace[b.opts.page]) {
-          b.corner = i._isIArea.call(this, a);
-          if (b.corner && i._foldingPage.call(this)) return (this.trigger("pressed", [b.point]), i._showFoldedPage.call(this, b.corner), !1);
-          b.corner = null;
-        }
-      },
-      _eventMove: function (a) {
-        var b = this.data().f;
-        if (!b.disabled) if ((a = t ? a.originalEvent.touches : [a]), b.corner) { var c = b.parent.offset(); b.corner.x = a[0].pageX - c.left; b.corner.y = a[0].pageY - c.top; i._showFoldedPage.call(this, b.corner); }
-        else if (b.hover && !this.data().effect && this.is(":visible")) if ((a = i._isIArea.call(this, a[0]))) { if (("sheet" == b.effect && 2 == a.corner.length) || "hard" == b.effect) (b.status = "hover"), (b = i._c.call(this, a.corner, b.opts.cornerSize / 2)), (a.x = b.x), (a.y = b.y), i._showFoldedPage.call(this, a, !0); }
-        else "hover" == b.status && (b.status = "", i.hideFoldedPage.call(this, !0));
-      },
-      _eventEnd: function () { var a = this.data().f, b = a.corner; !a.disabled && b && "prevented" != s("released", this, [a.point || b]) && i.hideFoldedPage.call(this, !0); a.corner = null; },
-      disable: function (a) { i.setData.call(this, { disabled: a }); return this; },
-      hover: function (a) { i.setData.call(this, { hover: a }); return this; },
-      peel: function (a, b) {
-        var c = this.data().f;
-        if (a) { if (-1 == f.inArray(a, o.all)) throw p("Corner " + a + " is not permitted"); if (-1 != f.inArray(a, i._cAllowed.call(this))) { var d = i._c.call(this, a, c.opts.cornerSize / 2); c.status = "peel"; i._showFoldedPage.call(this, { corner: a, x: d.x, y: d.y }, b); } }
-        else (c.status = ""), i.hideFoldedPage.call(this, b);
-        return this;
-      }
-    };
-  window.requestAnim = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (a) { window.setTimeout(a, 1e3 / 60); };
-  f.extend(f.fn, {
-    flip: function () { return I(f(this[0]), i, arguments); },
-    turn: function () { return I(f(this[0]), g, arguments); },
-    transform: function (a, b) { var c = {}; b && (c[v + "transform-origin"] = b); c[v + "transform"] = a; return this.css(c); },
-    animatef: function (a) {
-      var b = this.data(); b.effect && b.effect.stop();
-      if (a) {
-        a.to.length || (a.to = [a.to]); a.from.length || (a.from = [a.from]);
-        for (var c = [], d = a.to.length, e = !0, g = this, i = new Date().getTime(),
-          j = function () {
-            if (b.effect && e) {
-              for (var f = [], k = Math.min(a.duration, new Date().getTime() - i), l = 0; l < d; l++)
-                f.push(b.effect.easing(1, k, a.from[l], c[l], a.duration));
-              a.frame(d == 1 ? f[0] : f);
-              if (k == a.duration) { delete b.effect; g.data(b); a.complete && a.complete(); } else window.requestAnim(j);
-            }
-          }, l = 0; l < d; l++) c.push(a.to[l] - a.from[l]);
-        b.effect = f.extend({ stop: function () { e = false; }, easing: function (a, b, c, d, e) { return d * Math.sqrt(1 - (b = b / e - 1) * b) + c; } }, a);
-        this.data(b); j();
-      } else delete b.effect;
-    }
-  });
-  f.isTouch = t; f.mouseEvents = q; f.cssPrefix = S;
-  f.cssTransitionEnd = function () { var a, b = document.createElement("fakeelement"), c = { transition: "transitionend", OTransition: "oTransitionEnd", MSTransition: "transitionend", MozTransition: "transitionend", WebkitTransition: "webkitTransitionEnd" }; for (a in c) if (void 0 !== b.style[a]) return c[a]; };
-  f.findPos = C;
-})(jQuery);
-</script>
 <style>
   :root {
-    --bg: #111113; --panel: #18181b; --border: #2d2d32;
+    --bg: #111113; --panel: #18181b;
+    --line: #383c46;
     --amber: #f5a623; --amber-dim: #c07820; --amber-glow: rgba(245,166,35,.15);
     --text: #ddd8cc; --muted: #5a5a62;
-    --form-bg: #f9f8f5; --ink: #111; --rule: #c0bbb4; --err: #e05555;
+    --form-bg: #f9f8f5; --ink: #121212; --rule: #c0bbb4;
+    --ok: #6fb678; --warn: #d0a443; --idle: #8a8f99; --danger-color: #c55d5d;
   }
 
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
 
   body {
+    min-height: 100vh;
     background: var(--bg);
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,.06) 0%, transparent 70%);
+    background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,.05) 0%, transparent 70%);
     color: var(--text);
     font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
   }
 
   /* ── App Bar ── */
-  #appBar {
-    position: sticky; top: 0; z-index: 100;
-    background: linear-gradient(180deg, #222226 0%, #18181b 100%);
-    border-bottom: 1px solid #2a2a2e;
-    box-shadow: 0 1px 0 rgba(245,166,35,.4), 0 4px 24px rgba(0,0,0,.5);
-    padding: 8px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  }
-
-  .app-title {
-    font-size: 14px; font-weight: 700; letter-spacing: 3px;
-    color: var(--amber); text-transform: uppercase; white-space: nowrap;
-    text-shadow: 0 0 20px rgba(245,166,35,.4);
-  }
-
-  .epr-toggle {
+  .appbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     display: flex;
-    border: 1px solid var(--amber-dim);
-    border-radius: 4px; overflow: hidden;
-    box-shadow: 0 0 12px rgba(245,166,35,.1);
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 8px 20px;
+    background: linear-gradient(180deg, #222226, #18181b);
+    border-bottom: 1px solid #2a2a2e;
+    box-shadow: 0 1px 0 rgba(245,166,35,.3), 0 4px 20px rgba(0,0,0,.4);
   }
-  .epr-btn {
-    background: transparent; color: var(--amber-dim);
-    border: none; padding: 5px 22px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2.5px;
-    cursor: pointer; transition: background .2s, color .2s, box-shadow .2s;
-    text-transform: uppercase;
-  }
-  .epr-btn + .epr-btn { border-left: 1px solid var(--amber-dim); }
-  .epr-btn.active {
-    background: linear-gradient(180deg, #f5a623 0%, #d48a10 100%);
-    color: #000; box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
-  }
-  .epr-btn:not(.active):hover { background: var(--amber-glow); color: var(--amber); }
 
-  /* Page nav */
-  .nav-cluster { display: flex; align-items: center; gap: 6px; margin-left: 8px; }
-  .nav-arrow {
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--amber);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .server-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--idle);
+    flex: 0 0 auto;
+    transition: background .4s;
+  }
+  .server-dot.online  { background: var(--ok); box-shadow: 0 0 5px rgba(111,182,120,.6); }
+  .server-dot.local   { background: var(--warn); box-shadow: 0 0 5px rgba(208,164,67,.5); }
+
+  /* Toggle button groups */
+  .toggle-group {
+    display: inline-flex;
+    border: 1px solid var(--amber-dim);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .toggle-group button {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    border-right: 1px solid var(--amber-dim);
+    border-radius: 0;
     background: transparent;
-    border: 1px solid var(--amber-dim); color: var(--amber);
-    width: 28px; height: 28px; border-radius: 4px;
-    cursor: pointer; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .15s; font-family: serif;
+    color: var(--amber-dim);
+    padding: 5px 18px;
+    transition: background .15s, color .15s;
   }
-  .nav-arrow:hover:not(:disabled) { background: var(--amber); color: #000; box-shadow: 0 0 10px rgba(245,166,35,.3); }
-  .nav-arrow:disabled { opacity: 0.2; cursor: default; }
-  .nav-info {
-    font-size: 11.5px; letter-spacing: 1.5px; color: var(--amber);
-    white-space: nowrap; min-width: 78px; text-align: center;
-    text-shadow: 0 0 12px rgba(245,166,35,.3);
+
+  .toggle-group button:last-child { border-right: none; }
+
+  .toggle-group button.active {
+    background: linear-gradient(180deg, #f5a623, #d48a10);
+    color: #000;
   }
+
+  .toggle-group button:hover:not(.active):not(:disabled) {
+    background: var(--amber-glow);
+    color: var(--amber);
+  }
+
+  /* Generic buttons */
+  .btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    padding: 5px 12px;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+
+  .btn:hover:not(:disabled) { border-color: var(--amber-dim); color: var(--amber); background: var(--amber-glow); }
+  .btn:disabled { opacity: 0.3; cursor: default; }
+
+  .btn.primary {
+    background: linear-gradient(180deg, #f5a623, #d48a10);
+    color: #000;
+    border-color: var(--amber-dim);
+    box-shadow: 0 2px 8px rgba(245,166,35,.2);
+  }
+
+  .btn.primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ffc547, #e8a020);
+    box-shadow: 0 4px 14px rgba(245,166,35,.35);
+  }
+
+  .btn.danger { border-color: #4a2222; color: var(--danger-color); }
+  .btn.danger:hover:not(:disabled) { background: rgba(200,60,60,.1); border-color: #884444; }
+
+  /* Nav cluster */
+  .nav-cluster { display: flex; align-items: center; gap: 6px; }
+  .nav-info { font-size: 11px; letter-spacing: 1px; color: var(--amber); white-space: nowrap; min-width: 80px; text-align: center; }
 
   .ro-badge {
-    background: linear-gradient(135deg, #2a1e08, #3a2a10);
-    border: 1px solid var(--amber-dim); color: var(--amber);
-    font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
-    padding: 3px 10px; border-radius: 3px; text-transform: uppercase;
-    display: none; box-shadow: 0 0 10px rgba(245,166,35,.15);
+    display: none;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 3px;
+    padding: 3px 8px;
   }
   .ro-badge.show { display: inline-block; }
 
-  .bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-  .btn {
-    font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 5px 14px; border-radius: 4px;
-    cursor: pointer; border: none; transition: all .15s; white-space: nowrap;
-  }
-  .btn-ghost {
-    background: transparent; border: 1px solid #333338; color: var(--muted);
-  }
-  .btn-ghost:hover { border-color: var(--amber-dim); color: var(--amber); background: var(--amber-glow); }
-  .btn-warn { background: transparent; border: 1px solid #4a3020; color: #c08040; }
-  .btn-warn:hover { background: rgba(200,120,40,.12); border-color: var(--amber-dim); color: var(--amber); }
-  .btn-primary {
-    background: linear-gradient(180deg, #f5a623 0%, #d48a10 100%);
-    color: #000; box-shadow: 0 2px 8px rgba(245,166,35,.25), inset 0 1px 0 rgba(255,255,255,.2);
-  }
-  .btn-primary:hover { background: linear-gradient(180deg, #ffc547 0%, #e8a020 100%); box-shadow: 0 4px 16px rgba(245,166,35,.4); }
-  .btn-outline { background: transparent; border: 1px solid var(--amber-dim); color: var(--amber); }
-  .btn-outline:hover { background: var(--amber-glow); box-shadow: 0 0 10px rgba(245,166,35,.15); }
-  .btn-danger { background: transparent; border: 1px solid #4a2222; color: #bb5555; }
-  .btn-danger:hover { background: rgba(200,60,60,.1); border-color: #884444; }
-
-  /* ── Book Stage ── */
-  .stage {
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 44px 20px 80px;
-  }
-
-  /* ── Book Wrap ── */
-  .book-wrap { position: relative; flex-shrink: 0; }
-
-  .page-ghost { position: absolute; border: 1px solid #c8c3bb; pointer-events: none; }
-  .page-ghost-1 { top: 6px; left: 6px; right: -6px; bottom: -6px; z-index: 1; background: #edeae3; }
-  .page-ghost-2 { top: 12px; left: 12px; right: -12px; bottom: -12px; z-index: 0; background: #e7e3db; }
-  .page-ghost-3 { top: 18px; left: 18px; right: -18px; bottom: -18px; z-index: -1; background: #e0dbd3; }
-
-  /* turn.js overlay handled by JS */
+  .spacer { flex: 1 1 auto; }
+  .btn-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
   /* ── Form Sheet ── */
-  .form-sheet {
-    position: relative; z-index: 2;
-    background: var(--form-bg); color: var(--ink);
-    width: 760px; padding: 24px 34px 20px;
+  .stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 36px 20px 60px;
+  }
+
+  .sheet {
+    background: var(--form-bg);
+    color: var(--ink);
+    width: 760px;
+    padding: 24px 30px 20px;
     font-family: 'Courier Prime', monospace;
-    font-size: 12.5px; line-height: 1.5;
-    box-shadow:
-      0 0 0 1px rgba(245,166,35,.12),
-      0 12px 60px rgba(0,0,0,.8),
-      0 4px 16px rgba(0,0,0,.5),
-      0 0 80px rgba(245,166,35,.04);
+    font-size: 12.5px;
+    line-height: 1.5;
+    box-shadow: 0 0 0 1px rgba(245,166,35,.1), 0 12px 50px rgba(0,0,0,.7);
     border-top: 2px solid rgba(245,166,35,.3);
   }
-  .form-sheet.flipping { opacity: 0; }
 
-  /* Read-only banner */
-  .ro-banner {
+  .sheet.readonly input {
+    pointer-events: none;
+    opacity: .75;
+  }
+
+  /* Banner shown on saved/edit records */
+  .banner {
     display: none;
+    margin-bottom: 10px;
+    padding: 5px 8px;
+    border: 1px solid var(--amber-dim);
     background: linear-gradient(135deg, #2a1e08, #3d2a0e);
-    border: 1px solid var(--amber-dim); border-radius: 2px;
-    color: var(--amber); font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 700; letter-spacing: 3px;
-    text-align: center; padding: 5px; margin-bottom: 10px;
-    text-transform: uppercase; box-shadow: 0 0 16px rgba(245,166,35,.1);
+    color: var(--amber);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
   }
-  .ro-banner.show { display: block; }
-
-  .form-sheet.readonly input,
-  .form-sheet.readonly .mach-opt,
-  .form-sheet.readonly .tp-btn,
-  .form-sheet.readonly .tp-wrap { pointer-events: none; opacity: 0.75; }
-
-  /* ── Form internals ── */
-  .fhb { border: 1.5px solid #1a1a1a; margin-bottom: 12px; }
-  .fhb-title { text-align: center; font-weight: 700; font-size: 15px; padding: 6px 8px; border-bottom: 1px solid #1a1a1a; }
-  .fhb-meta { display: flex; justify-content: space-between; padding: 3px 10px; font-size: 11.5px; }
-
-  .sec-specs { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1.5px solid #1a1a1a; }
-  .sec-info { padding-bottom: 6px; margin-bottom: 0; border-bottom: 1.5px solid #1a1a1a; }
-  .instr { display: flex; gap: 6px; font-size: 12px; margin-bottom: 3px; }
-  .instr .arrow { color: #444; }
-  .bullets { margin-left: 24px; margin-top: 4px; }
-  .brow { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 12px; }
-  .brow label { white-space: nowrap; }
-  .ir { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 12px; flex-wrap: wrap; }
-  .ir-lbl { display: flex; gap: 4px; align-items: center; font-weight: 700; white-space: nowrap; }
-  .ir-lbl .arrow { font-weight: 400; color: #444; }
-
-  .fi {
-    border: none; border-bottom: 1px solid var(--rule);
-    background: transparent; font-family: 'Courier Prime', monospace;
-    font-size: 12.5px; color: var(--ink);
-    padding: 1px 3px; outline: none; height: 22px;
-    transition: border-color .15s, background .15s;
+  .banner.show { display: block; }
+  .banner.editing {
+    background: linear-gradient(135deg, #0e2a1e, #163d28);
+    border-color: #3a9a6a;
+    color: #5dca8a;
   }
-  .fi:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); }
-  .fi-md { width: 155px; } .fi-xs { width: 52px; } .fi-op { width: 108px; } .fi-run { width: 62px; }
+
+  /* Form header box */
+  .doc-box { border: 1.5px solid #1a1a1a; margin-bottom: 12px; }
+  .doc-title { text-align: center; font-weight: 700; font-size: 15px; padding: 6px 8px; border-bottom: 1px solid #1a1a1a; }
+  .doc-meta { display: flex; justify-content: space-between; padding: 3px 10px; font-size: 11px; }
+
+  /* Form sections */
+  .section {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid #1a1a1a;
+    font-size: 12px;
+  }
+
+  .line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .lbl { font-weight: 700; white-space: nowrap; }
+
+  /* Form fields */
+  .field {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 1px 3px;
+    height: 22px;
+  }
+
+  .field:focus {
+    outline: none;
+    border-bottom-color: var(--amber-dim);
+    background: rgba(245,166,35,.06);
+  }
+
+  /* Native time input — simpler than a custom picker.
+     Note: display format varies by browser/OS, but the stored value
+     is always HH:MM in 24-hour format. */
+  input[type="time"] {
+    font-family: 'Courier Prime', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 1px 2px;
+    height: 22px;
+    width: 80px;
+    cursor: pointer;
+  }
+
+  input[type="time"]:focus {
+    outline: none;
+    border-bottom-color: var(--amber-dim);
+    background: rgba(245,166,35,.06);
+  }
 
   input[type="date"] {
-    border: none; border-bottom: 1px solid var(--rule); background: transparent;
-    font-family: 'Courier Prime', monospace; font-size: 11.5px; color: var(--ink);
-    padding: 1px 2px; outline: none; height: 22px; cursor: pointer;
-    transition: border-color .15s, background .15s; width: 132px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 1px 2px;
+    height: 22px;
+    width: 130px;
+    cursor: pointer;
   }
-  input[type="date"]:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); }
 
-  /* ── Custom Time Picker ── */
-  .tp-wrap { position: relative; display: inline-block; }
-  .tp-btn {
-    border: none; border-bottom: 1px solid var(--rule);
-    background: transparent; font-family: 'Courier Prime', monospace;
-    font-size: 11.5px; color: var(--ink); padding: 1px 4px;
-    height: 22px; cursor: pointer; width: 68px; text-align: left;
-    transition: border-color .15s, background .15s;
+  input[type="date"]:focus {
+    outline: none;
+    border-bottom-color: var(--amber-dim);
+    background: rgba(245,166,35,.06);
   }
-  .tp-btn:hover, .tp-btn:focus { border-bottom-color: #c07820; background: rgba(245,166,35,.06); outline: none; }
-  .tp-btn.has-value { color: var(--ink); }
-  .tp-btn.empty { color: #aaa; }
 
-  .tp-popup {
-    display: none; position: absolute;
-    top: 0; left: calc(100% + 6px);
-    z-index: 999;
-    background: #1c1c1e;
-    border: 1px solid var(--amber-dim);
-    border-radius: 4px; padding: 10px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 0 1px rgba(245,166,35,.08);
-    user-select: none; white-space: nowrap;
+  .w-xs { width: 52px; }
+  .w-sm { width: 80px; }
+  .w-md { width: 155px; }
+  .w-lg { width: 220px; }
+  .w-xl { flex: 1; min-width: 180px; }
+
+  /* Foil entry blocks */
+  .foil-block {
+    border-top: 1.5px solid #1a1a1a;
+    padding-top: 6px;
+    margin-top: 6px;
+    font-size: 12px;
   }
-  .tp-popup.open { display: flex; gap: 10px; }
 
-  .tp-col { display: flex; flex-direction: column; gap: 5px; }
-  .tp-col-hdr {
-    background: linear-gradient(180deg, #f5a623 0%, #c07820 100%);
-    color: #000; text-align: center;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    padding: 4px 0; border-radius: 3px;
+  .foil-title { font-weight: 700; font-size: 12.5px; margin-bottom: 4px; }
+
+  .form-footer {
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px solid var(--rule);
+    text-align: right;
+    color: #888;
+    font-size: 11px;
+    font-family: 'Courier Prime', monospace;
   }
-  .tp-grid { display: grid; gap: 2px; }
-  .tp-hr-grid { grid-template-columns: repeat(4, 30px); }
-  .tp-mn-grid { grid-template-columns: repeat(10, 26px); }
 
-  .tp-cell {
-    background: #252528; color: #aaa8a0;
-    border: 1px solid #333338; border-radius: 2px;
-    font-family: 'Courier Prime', monospace; font-size: 11px;
-    text-align: center; padding: 3px 0; cursor: pointer;
-    transition: all .1s;
-  }
-  .tp-cell:hover { background: #c07820; color: #000; border-color: #f5a623; }
-  .tp-cell.selected { background: linear-gradient(180deg, #f5a623 0%, #c07820 100%); color: #000; border-color: #f5a623; font-weight: 700; box-shadow: 0 0 6px rgba(245,166,35,.35); }
-
-  .mach-area { display: flex; align-items: center; gap: 18px; margin-bottom: 5px; font-size: 12px; }
-  .mach-lbl { display: flex; gap: 4px; font-weight: 700; align-items: center; }
-  .mach-lbl .arrow { font-weight: 400; color: #444; }
-  .mach-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 400; }
-  .mach-opt input[type=radio] { width: 13px; height: 13px; cursor: pointer; accent-color: #c07820; }
-
-  .pos-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 12px; flex-wrap: wrap; }
-  .pos-grp { display: flex; align-items: center; gap: 3px; }
-  .pos-grp span { font-size: 11px; }
-  .ext-val { border-bottom: 1px solid var(--rule); padding: 0 3px 1px; min-width: 90px; display: inline-block; }
-
-  .foil-block { border-top: 1.5px solid #1a1a1a; padding: 6px 0 4px; }
-  .foil-hd { font-weight: 700; font-size: 12.5px; margin-bottom: 4px; }
-  .frow { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-size: 12px; flex-wrap: wrap; }
-  .frow-lbl { white-space: nowrap; min-width: 152px; flex-shrink: 0; }
-  .frow-run { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-  .frow-run span { font-size: 11px; }
-  .frow-op { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-  .frow-op span { font-size: 11px; }
-  .frow-dt-line { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; font-size: 12px; flex-wrap: wrap; }
-  .frow-dt-line .frow-lbl { min-width: 152px; }
-  .frow-reason { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; font-size: 12px; flex-wrap: wrap; }
-  .frow-reason label { white-space: nowrap; min-width: 152px; flex-shrink: 0; }
-  .form-footer { text-align: right; font-size: 11px; color: #999; margin-top: 8px; border-top: 1px solid var(--rule); padding-top: 4px; }
-
-  /* ── Toast ── */
+  /* Toast */
   #toast {
-    position: fixed; bottom: 28px; left: 50%;
-    transform: translateX(-50%) translateY(16px);
-    background: linear-gradient(135deg, #1e1e22, #252528);
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(12px);
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    background: #1e1e22;
     color: var(--text);
-    border: 1px solid #333338; border-left: 3px solid var(--amber);
-    padding: 11px 22px; border-radius: 6px;
-    font-size: 13px; font-weight: 600; letter-spacing: .5px;
-    opacity: 0; transition: opacity .25s, transform .25s;
-    z-index: 400; pointer-events: none; white-space: nowrap;
-    box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(245,166,35,.08);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--amber);
+    padding: 10px 18px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 50;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
   }
-  .machine-epr-cluster { display: flex; flex-direction: column; gap: 4px; }
-  .toggle-label { font-size: 9px; color: var(--amber-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1px; }
-  .server-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #555; display: inline-block;
-    margin-left: 7px; vertical-align: middle;
-    transition: background .4s, box-shadow .4s;
-    cursor: default;
+
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { border-left-color: var(--danger-color); }
+
+  /* Loading overlay */
+  .loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 40;
+    align-items: center;
+    justify-content: center;
   }
-  .server-dot.online  { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,.6); }
-  .server-dot.local   { background: #f5a623; box-shadow: 0 0 6px rgba(245,166,35,.5); }
-  .server-dot.offline { background: #666; }
 
+  .loading.show { display: flex; }
 
+  .loading-card {
+    background: var(--panel);
+    color: var(--amber);
+    border: 1px solid var(--line);
+    padding: 14px 20px;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Print */
   @page { size: letter portrait; margin: 0; }
+
   @media print {
-    #appBar, #toast { display: none !important; }
-    body { background: #fff; margin: 0; }
+    .appbar, #toast, .loading { display: none !important; }
+    body { background: #fff; }
     .stage { padding: 0; }
-    .book-wrap { display: block; }
-    .page-ghost-1, .page-ghost-2, .page-ghost-3 { display: none; }
-    .ro-banner { display: none !important; }
-    .form-sheet {
-      box-shadow: none; width: 100%; padding: 10px 16px;
-      font-size: 10.5px; zoom: 0.99; opacity: 1 !important;
+    .sheet {
+      box-shadow: none;
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 10.5px;
       border-top: none;
     }
-    .foil-block { padding: 4px 0 3px; }
-    .foil-hd { margin-bottom: 2px; }
-    .frow, .frow-dt-line, .frow-reason { margin-bottom: 2px; }
-    .sec-specs { padding-bottom: 4px; margin-bottom: 4px; }
-    .sec-info { padding-bottom: 3px; }
-    .bullets { margin-top: 2px; }
-    .brow { margin-bottom: 2px; }
-    .ir { margin-bottom: 3px; }
-    .fhb { margin-bottom: 7px; }
-    input[type="date"], .fi { border-bottom: 1px solid #999; opacity: 1 !important; }
-    .ext-val { border-bottom: 1px solid #999; }
-    .mach-opt { opacity: 1 !important; }
+    .banner { display: none !important; }
+    .foil-block { padding-top: 4px; margin-top: 4px; }
+    .field, input[type="date"], input[type="time"] {
+      border-bottom: 1px solid #999;
+      opacity: 1 !important;
+    }
   }
 </style>
 </head>
 <body>
 
-<!-- ── App Bar ── -->
-<div id="appBar">
-  <div class="app-title">TR30 &middot; Foil Log<span class="server-dot offline" id="serverDot" title="Server: checking..."></span></div>
+<div class="appbar">
+  <div class="title">
+    TR30 · Foil Log
+    <span id="serverDot" class="server-dot" title="Server: checking"></span>
+  </div>
 
-  <div class="machine-epr-cluster">
-    <div class="toggle-label">Machine</div>
-    <div class="epr-toggle">
-      <button class="epr-btn active" id="btnTR1" onclick="switchMachine(1)">TR30-1</button>
-      <button class="epr-btn"        id="btnTR2" onclick="switchMachine(2)">TR30-2</button>
-    </div>
-    <div class="toggle-label" style="margin-top:3px">Extractor</div>
-    <div class="epr-toggle">
-      <button class="epr-btn active" id="btn41" onclick="switchEPR(41)">EPR-41</button>
-      <button class="epr-btn"        id="btn42" onclick="switchEPR(42)">EPR-42</button>
-    </div>
+  <div class="toggle-group" id="machineToggle" aria-label="Machine selector">
+    <button type="button" data-machine="1" class="active">TR30-1</button>
+    <button type="button" data-machine="2">TR30-2</button>
+  </div>
+
+  <div class="toggle-group" id="extractorToggle" aria-label="Extractor selector">
+    <button type="button" data-extractor="41" class="active">EPR-41</button>
+    <button type="button" data-extractor="42">EPR-42</button>
   </div>
 
   <div class="nav-cluster">
-    <button class="nav-arrow" id="btnPrev" onclick="navigate(-1)" title="Newer page">&#8592;</button>
-    <span class="nav-info" id="navInfo">Page 1 of 1</span>
-    <button class="nav-arrow" id="btnNext" onclick="navigate(1)" title="Older page">&#8594;</button>
-    <button class="btn btn-outline" id="btnJump" onclick="jumpToFront()" style="display:none;font-size:11px;padding:4px 10px;margin-left:4px">Jump to Front</button>
+    <button type="button" class="btn" id="prevPageBtn">&#8592;</button>
+    <span class="nav-info" id="navInfo">Draft</span>
+    <button type="button" class="btn" id="nextPageBtn">&#8594;</button>
+    <button type="button" class="btn" id="jumpToDraftBtn" style="display:none;">Jump to Draft</button>
   </div>
 
   <span class="ro-badge" id="roBadge">Read Only</span>
 
-  <div class="bar-right">
-    <button class="btn btn-danger"   id="btnDelete"      onclick="deleteCurrentPage()"  style="display:none">Delete Page</button>
-    <button class="btn btn-outline"  id="btnReprint"     onclick="reprintCurrent()"     style="display:none">Reprint PDF</button>
-    <button class="btn btn-ghost"    id="btnEdit"        onclick="startEdit()"          style="display:none">Edit Record</button>
-    <button class="btn btn-danger"   id="btnCancelEdit"  onclick="cancelEdit()"         style="display:none">Cancel Edit</button>
-    <button class="btn btn-primary"  id="btnSaveEdit"    onclick="saveEdit()"           style="display:none">Save Changes</button>
-    <button class="btn btn-ghost"    onclick="printForm()">Print</button>
-    <button class="btn btn-warn"     id="btnNew"  onclick="newPage()">New Page</button>
-    <button class="btn btn-primary"  id="btnSave" onclick="savePage()">Save + PDF</button>
+  <div class="spacer"></div>
+
+  <div class="btn-group">
+    <button type="button" class="btn danger" id="deletePageBtn" style="display:none;">Delete Page</button>
+    <button type="button" class="btn"         id="reprintBtn"    style="display:none;">Reprint PDF</button>
+    <button type="button" class="btn"         id="editBtn"       style="display:none;">Edit Record</button>
+    <button type="button" class="btn danger"  id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+    <button type="button" class="btn primary" id="saveEditBtn"   style="display:none;">Save Changes</button>
+    <button type="button" class="btn"         id="printBtn">Print</button>
+    <button type="button" class="btn"         id="newPageBtn">New Page</button>
+    <button type="button" class="btn primary" id="savePageBtn">Save + PDF</button>
   </div>
 </div>
 
-<!-- ── Book Stage ── -->
 <div class="stage">
-  <div class="book-wrap" id="bookWrap">
-    <div class="page-ghost page-ghost-3"></div>
-    <div class="page-ghost page-ghost-2"></div>
-    <div class="page-ghost page-ghost-1"></div>
+  <div class="sheet" id="formSheet">
+    <div class="banner" id="sheetBanner">Read Only — Saved Record</div>
 
-    <div class="form-sheet" id="formSheet">
-      <div class="ro-banner" id="roBanner">&#128274; Read Only — Saved Record</div>
-
-      <!-- Header -->
-      <div class="fhb">
-        <div class="fhb-title">Foil Performance Log (TR30) &mdash; <span id="formMachineLabel">TR30-1</span></div>
+    <div class="doc-box">
+      <div class="doc-title">Foil Performance Log (TR30) — <span id="machineLabel">TR30-1</span></div>
+      <div class="doc-meta">
+        <span>Document-217822</span>
+        <span>Release No. 1</span>
+        <span>Release Date: 2022-01-19</span>
       </div>
-
-      <!-- Specs -->
-      <div class="sec-specs">
-        <div class="instr"><span class="arrow">&#9658;</span><span>Initiate new form when carousel is replaced.</span></div>
-        <div class="instr"><span class="arrow">&#9658;</span><span><strong>FOIL SPECIFICATIONS:</strong></span></div>
-        <div class="bullets">
-          <div class="brow"><span>&bull;</span><label>Total Thickness:</label><input class="fi fi-md" type="text" id="totalThickness" oninput="autosave()"></div>
-          <div class="brow"><span>&bull;</span><label>Lot Number:</label><input class="fi fi-md" type="text" id="lotNumber" oninput="autosave()"></div>
-          <div class="brow"><span>&bull;</span><label>Oven temp and foil baking time:</label><input class="fi fi-md" type="text" id="ovenTemp" oninput="autosave()"></div>
-          <div class="brow"><span>&bull;</span><label>Other:</label><input class="fi fi-md" type="text" id="otherSpec" oninput="autosave()"></div>
-        </div>
-      </div>
-
-      <!-- Info -->
-      <div class="sec-info">
-        <div class="ir">
-          <div class="ir-lbl"><span class="arrow">&#9658;</span><span>Date Carousel Installed:</span></div>
-          <input type="date" id="carouselInstalled" onchange="autosave()">
-          <span style="margin-left:12px;font-weight:700;">Removed:</span>
-          <input type="date" id="carouselRemoved" onchange="autosave()">
-        </div>
-        <div class="ir">
-          <div class="ir-lbl"><span class="arrow">&#9658;</span><span>Extractor:</span></div>
-          <span class="ext-val" id="extractorLabel">EPR 41</span>
-        </div>
-        <div class="pos-row">
-          <div class="ir-lbl"><span class="arrow">&#9658;</span><span>Foil Position Readout:</span></div>
-          <div class="pos-grp"><span>1.</span><input class="fi fi-xs" type="text" id="pos1" oninput="autosave()"></div>
-          <div class="pos-grp"><span>2.</span><input class="fi fi-xs" type="text" id="pos2" oninput="autosave()"></div>
-          <div class="pos-grp"><span>3.</span><input class="fi fi-xs" type="text" id="pos3" oninput="autosave()"></div>
-          <div class="pos-grp"><span>4.</span><input class="fi fi-xs" type="text" id="pos4" oninput="autosave()"></div>
-          <div class="pos-grp"><span>5.</span><input class="fi fi-xs" type="text" id="pos5" oninput="autosave()"></div>
-        </div>
-      </div>
-
-      <!-- Foil Blocks -->
-      <div id="foilsContainer"></div>
-      <div class="form-footer" id="formFooter">Page 1 of 1</div>
     </div>
+
+    <div class="section">
+      <div class="line">&#9658; Initiate new form when carousel is replaced.</div>
+      <div class="line"><span class="lbl">&#9658; FOIL SPECIFICATIONS:</span></div>
+      <div class="line"><span>&#8226;</span><label>Total Thickness:</label><input id="totalThickness" class="field w-md" type="text"></div>
+      <div class="line"><span>&#8226;</span><label>Lot Number:</label><input id="lotNumber" class="field w-md" type="text"></div>
+      <div class="line"><span>&#8226;</span><label>Oven temp and foil baking time:</label><input id="ovenTemp" class="field w-md" type="text"></div>
+      <div class="line"><span>&#8226;</span><label>Other:</label><input id="otherSpec" class="field w-md" type="text"></div>
+    </div>
+
+    <div class="section">
+      <div class="line">
+        <span class="lbl">&#9658; Date Carousel Installed:</span>
+        <input id="carouselInstalled" type="date">
+        <span class="lbl" style="margin-left:10px;">Removed:</span>
+        <input id="carouselRemoved" type="date">
+      </div>
+      <div class="line">
+        <span class="lbl">&#9658; Extractor:</span>
+        <span id="extractorLabel">EPR 41</span>
+      </div>
+      <div class="line">
+        <span class="lbl">&#9658; Foil Position Readout:</span>
+        <label>1. <input id="pos1" class="field w-xs" type="text"></label>
+        <label>2. <input id="pos2" class="field w-xs" type="text"></label>
+        <label>3. <input id="pos3" class="field w-xs" type="text"></label>
+        <label>4. <input id="pos4" class="field w-xs" type="text"></label>
+        <label>5. <input id="pos5" class="field w-xs" type="text"></label>
+      </div>
+    </div>
+
+    <div id="foilsContainer"></div>
+
+    <div class="form-footer" id="formFooter">Draft</div>
   </div>
 </div>
 
 <div id="toast"></div>
+<div class="loading" id="loadingOverlay">
+  <div class="loading-card">Loading...</div>
+</div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// CONFIG — Server admin sets this after backend is deployed
-// ══════════════════════════════════════════════════════════
-const API_BASE = '/foil-api.php';
-// e.g. 'https://atgrecords.triumf.ca/foil-api.php'
+/*
+  ============================================================
+  TR30 FOIL PERFORMANCE LOG — Main Script
+  ============================================================
 
-// ── State ──────────────────────────────────────────────────
-let currentMachine = 1;    // 1 = TR30-1, 2 = TR30-2
-let currentEPR     = 41;
-let viewIndex      = 0;
-let isEditing      = false;
-let autosaveTimer  = null;
-let _currentPages  = [];   // pages for active machine+EPR
-let _currentDraft  = null; // draft for active machine+EPR
+  TABLE OF CONTENTS
+  -----------------
+  1.  Configuration
+  2.  App State
+  3.  Storage Key Helpers
+  4.  Local Storage
+  5.  Server API
+  6.  Server Status Dot
+  7.  Draft: Save, Clear
+  8.  Saved Pages: Save
+  9.  Reload All Data
+  10. Loading Overlay
+  11. Empty Form Template
+  12. Toast Notification
+  13. Render Foil Blocks
+  14. Load Form
+  15. Read Form
+  16. Auto-Fill Next Foil
+  17. Autosave
+  18. Page Number Helper
+  19. Edit Saved Record
+  20. View State
+  21. Navigation
+  22. Switch Machine
+  23. Switch Extractor
+  24. Delete Page
+  25. Save Page and Print PDF
+  26. Print Preparation
+  27. New Page
+  28. Event Wiring
+  29. App Startup
+  ============================================================
+*/
 
-// ── Key helpers ────────────────────────────────────────────
-function currentKey()  { return `TR30${currentMachine}_EPR${currentEPR}`; }
-function draftKey()    { return `fpl_${currentKey()}_draft`; }
-function pagesKey()    { return `fpl_${currentKey()}_pages`; }
 
-// ── localStorage helpers ───────────────────────────────────
-function ls_get(k)    { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
-function ls_set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-function ls_del(k)    { try { localStorage.removeItem(k); } catch {} }
+/* ============================================================
+   1. CONFIGURATION
+   Default assumes HTML and foil-api.php are in the same folder.
+   Change to a full URL only if they are hosted separately.
+   ============================================================ */
+const SERVER_API_URL = './foil-api.php';
 
-// ── Server status dot ──────────────────────────────────────
-function setServerDot(status) {
-  const d = document.getElementById('serverDot');
-  if (!d) return;
-  d.className = 'server-dot ' + status;
-  d.title = status === 'online'  ? 'Server: connected — data syncing centrally'
-          : status === 'local'   ? 'Server: unreachable — saving locally only'
-          : 'Server: checking...';
+
+/* ============================================================
+   2. APP STATE
+   ============================================================ */
+let activeMachine   = 1;     // 1 = TR30-1, 2 = TR30-2
+let activeExtractor = 41;    // 41 = EPR-41, 42 = EPR-42
+let pageViewIndex   = 0;     // 0 = draft, 1 = newest saved, 2 = next, etc.
+let editModeActive  = false;
+let autosaveTimer   = null;
+let savedPages      = [];
+let currentDraft    = null;
+
+
+/* ============================================================
+   3. STORAGE KEY HELPERS
+   Keys follow the pattern: TR301_EPR41_draft / TR301_EPR41_pages
+   ============================================================ */
+function getLogKey()   { return `TR30${activeMachine}_EPR${activeExtractor}`; }
+function getDraftKey() { return `${getLogKey()}_draft`; }
+function getPagesKey() { return `${getLogKey()}_pages`; }
+
+
+/* ============================================================
+   4. LOCAL STORAGE
+   Used as fallback when the server is offline. Operators are
+   never blocked from filling out the form — work continues
+   locally if the server is down. Locally-saved data will not
+   be visible from other computers and will not sync later.
+   ============================================================ */
+function localLoad(key) {
+  try { return JSON.parse(localStorage.getItem(key)); }
+  catch { return null; }
 }
 
-// ── Server API (timeout 5s) ────────────────────────────────
-async function apiGet(key, type) {
+function localSave(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); }
+  catch { /* storage full or unavailable */ }
+}
+
+function localDelete(key) {
+  try { localStorage.removeItem(key); }
+  catch { /* ignore */ }
+}
+
+
+/* ============================================================
+   5. SERVER API
+   All requests time out after 5 seconds.
+   Returns { ok: true, data } on success, { ok: false } on failure.
+   This distinction matters: "server says no draft exists" and
+   "server was unreachable" are different situations and must be
+   handled differently. See reloadAllData() for the full logic.
+   ============================================================ */
+async function serverLoad(logKey, type) {
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(`${API_BASE}?key=${encodeURIComponent(key)}&type=${encodeURIComponent(type)}`, { signal: ctrl.signal });
-    clearTimeout(t);
-    if (!r.ok) { setServerDot('local'); return null; }
-    setServerDot('online');
-    return await r.json();
-  } catch { setServerDot('local'); return null; }
-}
-
-async function apiSet(key, type, data) {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(API_BASE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, type, data }),
-      signal: ctrl.signal
-    });
-    clearTimeout(t);
-    if (r.ok) { setServerDot('online'); return true; }
-    setServerDot('local'); return false;
-  } catch { setServerDot('local'); return false; }
-}
-
-// ── Draft persistence ──────────────────────────────────────
-async function loadDraft() {
-  const server = await apiGet(currentKey(), 'draft');
-  if (server !== null) { ls_set(draftKey(), server); return server; }
-  return ls_get(draftKey()) || emptyForm();
-}
-
-async function saveDraft(data) {
-  _currentDraft = data;
-  ls_set(draftKey(), data);          // instant local save always
-  apiSet(currentKey(), 'draft', data); // async to server — fire and forget
-}
-
-// ── Pages persistence ──────────────────────────────────────
-async function loadPages() {
-  const server = await apiGet(currentKey(), 'pages');
-  if (server !== null) { ls_set(pagesKey(), server); _currentPages = server; return; }
-  _currentPages = ls_get(pagesKey()) || [];
-}
-
-async function savePages(pages) {
-  _currentPages = pages;
-  ls_set(pagesKey(), pages);
-  const ok = await apiSet(currentKey(), 'pages', pages);
-  if (!ok) showToast('Saved locally — server unreachable. Will sync when back online.', true);
-}
-
-// ── Reload all data for current machine+EPR ────────────────
-async function reloadAll() {
-  showSpinnerOverlay(true);
-  await Promise.all([ loadPages(), loadDraft().then(d => { _currentDraft = d; }) ]);
-  showSpinnerOverlay(false);
-}
-
-// ── Loading overlay ────────────────────────────────────────
-function showSpinnerOverlay(v) {
-  let el = document.getElementById('loadOverlay');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'loadOverlay';
-    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;';
-    el.innerHTML = '<div style="color:var(--amber);font-family:Rajdhani,sans-serif;font-size:15px;letter-spacing:3px;text-transform:uppercase;">Loading...</div>';
-    document.body.appendChild(el);
+    const controller = new AbortController();
+    const timeout    = setTimeout(() => controller.abort(), 5000);
+    const url        = `${SERVER_API_URL}?key=${encodeURIComponent(logKey)}&type=${encodeURIComponent(type)}`;
+    const response   = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!response.ok) { return { ok: false }; }
+    const json = await response.json();
+    // PHP wraps data in { "data": ... }. data can legitimately be null
+    // (meaning no file exists yet on the server). That is still a success.
+    return { ok: true, data: json.data !== undefined ? json.data : null };
+  } catch {
+    return { ok: false };
   }
-  el.style.display = v ? 'flex' : 'none';
 }
 
-// ── Empty form ─────────────────────────────────────────────
-function emptyForm() {
+async function serverSave(logKey, type, data) {
+  try {
+    const controller = new AbortController();
+    const timeout    = setTimeout(() => controller.abort(), 5000);
+    const response   = await fetch(SERVER_API_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ key: logKey, type, data }),
+      signal:  controller.signal
+    });
+    clearTimeout(timeout);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+
+/* ============================================================
+   6. SERVER STATUS DOT
+   Updated once after both load requests complete in reloadAllData(),
+   not after each individual request, to avoid a race condition
+   where whichever finishes last determines the final dot color.
+   Green = connected, Amber = offline (local only), Grey = checking.
+   ============================================================ */
+function updateServerDot(status) {
+  const dot = document.getElementById('serverDot');
+  if (!dot) return;
+  dot.className = `server-dot ${status}`;
+  dot.title = status === 'online' ? 'Server: connected — data syncing centrally'
+            : status === 'local'  ? 'Server: unreachable — saving locally only'
+            : 'Server: checking...';
+}
+
+
+/* ============================================================
+   7. DRAFT: SAVE, CLEAR
+   The draft is the in-progress form. It is saved automatically
+   after every keystroke. Server write is fire-and-forget —
+   local storage is always written first so work is never lost.
+   Loading is handled by reloadAllData().
+
+   clearDraft(): deletes locally, sends null to server.
+   The server stores null rather than deleting the file.
+   ============================================================ */
+function saveDraft(formData) {
+  currentDraft = formData;
+  localSave(getDraftKey(), formData);          // instant — always happens
+  serverSave(getLogKey(), 'draft', formData);  // background — fire and forget
+}
+
+function clearDraft() {
+  currentDraft = buildEmptyForm();
+  localDelete(getDraftKey());
+  serverSave(getLogKey(), 'draft', null);
+}
+
+
+/* ============================================================
+   8. SAVED PAGES: SAVE
+   Saved pages are completed records. Stored as an array,
+   newest at the end. Loading is handled by reloadAllData().
+   ============================================================ */
+async function writeSavedPages(pages) {
+  savedPages = pages;
+  localSave(getPagesKey(), pages);
+  const ok = await serverSave(getLogKey(), 'pages', pages);
+  if (!ok) showToast('Saved locally only — server unreachable. Data will not sync automatically.', true);
+}
+
+
+/* ============================================================
+   9. RELOAD ALL DATA
+   Called when switching machine or extractor. Both requests
+   run in parallel. The server dot is updated once after both
+   finish, based on whether either request failed.
+   ============================================================ */
+async function reloadAllData() {
+  showLoadingOverlay(true);
+  updateServerDot('checking');
+
+  const [draftResult, pagesResult] = await Promise.all([
+    serverLoad(getLogKey(), 'draft'),
+    serverLoad(getLogKey(), 'pages')
+  ]);
+
+  // Update dot once — online only if both requests succeeded
+  updateServerDot(draftResult.ok && pagesResult.ok ? 'online' : 'local');
+
+  if (draftResult.ok) {
+    if (draftResult.data !== null) {
+      currentDraft = draftResult.data;
+      localSave(getDraftKey(), draftResult.data);  // keep local in sync
+    } else {
+      currentDraft = buildEmptyForm();
+      localDelete(getDraftKey());  // server has no draft — clear stale local copy
+    }
+  } else {
+    currentDraft = localLoad(getDraftKey()) || buildEmptyForm();
+  }
+
+  if (pagesResult.ok) {
+    savedPages = Array.isArray(pagesResult.data) ? pagesResult.data : [];
+    localSave(getPagesKey(), savedPages);
+  } else {
+    const local = localLoad(getPagesKey());
+    savedPages = Array.isArray(local) ? local : [];
+  }
+
+  showLoadingOverlay(false);
+}
+
+
+/* ============================================================
+   10. LOADING OVERLAY
+   ============================================================ */
+function showLoadingOverlay(visible) {
+  document.getElementById('loadingOverlay').classList.toggle('show', !!visible);
+}
+
+
+/* ============================================================
+   11. EMPTY FORM TEMPLATE
+   ============================================================ */
+function buildEmptyForm() {
   return {
-    totalThickness:'', lotNumber:'', ovenTemp:'', otherSpec:'',
-    carouselInstalled:'', carouselRemoved:'', machine:'', pos:['','','','',''],
-    foils: Array.from({length:5}, ()=>({
-      startDate:'', startTime:'', startRun:'', startOp:'',
-      endDate:'',   endTime:'',   endRun:'',   endOp:'',
-      totalDose:'', reason:''
+    totalThickness: '', lotNumber: '', ovenTemp: '', otherSpec: '',
+    carouselInstalled: '', carouselRemoved: '',
+    machine: `TR30-${activeMachine}`,
+    epr: activeExtractor,
+    pos: ['', '', '', '', ''],
+    foils: Array.from({ length: 5 }, () => ({
+      startDate: '', startTime: '', startRun: '', startOp: '',
+      endDate:   '', endTime:   '', endRun:   '', endOp:   '',
+      totalDose: '', reason: ''
     }))
   };
 }
 
-// ── Toast ──────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.toggle('err', isErr);
-  t.classList.add('show');
+
+/* ============================================================
+   12. TOAST NOTIFICATION
+   Errors stay visible for 5 seconds, normal messages for 3.
+   ============================================================ */
+let toastTimer = null;
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = isError ? 'show error' : 'show';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> t.classList.remove('show'), isErr ? 6000 : 3200);
+  toastTimer = setTimeout(() => { toast.className = ''; }, isError ? 5000 : 3200);
 }
 
-// ── Render foil blocks ─────────────────────────────────────
-function renderFoils() {
-  const c = document.getElementById('foilsContainer');
-  c.innerHTML = '';
+
+/* ============================================================
+   13. RENDER FOIL BLOCKS
+   Builds the 5 FOIL entry rows on startup. Uses native
+   input[type="time"] — simpler than a custom picker, and the
+   stored value is always HH:MM in 24-hour format regardless
+   of how the browser displays it.
+   ============================================================ */
+function renderFoilBlocks() {
+  const container = document.getElementById('foilsContainer');
+  container.innerHTML = '';
+
   for (let i = 0; i < 5; i++) {
-    const n = i + 1;
-    const etKey = `f${i}_et_cb`;
-    _tpCallbacks[etKey] = () => onEndDateTimeChange(i);
-    const d = document.createElement('div');
-    d.className = 'foil-block';
-    d.innerHTML = `
-      <div class="foil-hd">FOIL#${n}</div>
-      <div class="frow-dt-line">
-        <span class="frow-lbl">Start Date and Time:</span>
-        <input type="date" id="f${i}_sd" onchange="autosave()">
-        ${tpHTML(`f${i}_st`, '')}
-        <div class="frow-run"><span>Run#:</span><input class="fi fi-run" type="text" id="f${i}_sr" oninput="autosave()"></div>
-        <div class="frow-op"><span>Operator:</span><input class="fi fi-op" type="text" id="f${i}_so" oninput="autosave()"></div>
+    const block = document.createElement('div');
+    block.className = 'foil-block';
+    block.innerHTML = `
+      <div class="foil-title">FOIL #${i + 1}</div>
+      <div class="line">
+        <span class="lbl" style="min-width:152px;">Start Date and Time:</span>
+        <input id="foil${i}_startDate" type="date">
+        <input id="foil${i}_startTime" type="time" step="60">
+        <label>Run#: <input id="foil${i}_startRun" class="field w-sm" type="text"></label>
+        <label>Operator: <input id="foil${i}_startOp" class="field w-md" type="text"></label>
       </div>
-      <div class="frow-dt-line">
-        <span class="frow-lbl">End Date and Time:</span>
-        <input type="date" id="f${i}_ed" onchange="onEndDateTimeChange(${i})">
-        ${tpHTML(`f${i}_et`, etKey)}
-        <div class="frow-run"><span>Run#:</span><input class="fi fi-run" type="text" id="f${i}_er" onchange="autoFillNextRun(${i})" oninput="autosave()"></div>
-        <div class="frow-op"><span>Operator:</span><input class="fi fi-op" type="text" id="f${i}_eo" oninput="autosave()"></div>
+      <div class="line">
+        <span class="lbl" style="min-width:152px;">End Date and Time:</span>
+        <input id="foil${i}_endDate" type="date">
+        <input id="foil${i}_endTime" type="time" step="60">
+        <label>Run#: <input id="foil${i}_endRun" class="field w-sm" type="text"></label>
+        <label>Operator: <input id="foil${i}_endOp" class="field w-md" type="text"></label>
       </div>
-      <div class="frow">
-        <span class="frow-lbl">Total Dose:</span>
-        <input class="fi" style="width:210px" type="text" id="f${i}_td" oninput="autosave()">
+      <div class="line">
+        <span class="lbl" style="min-width:152px;">Total Dose:</span>
+        <input id="foil${i}_totalDose" class="field w-lg" type="text">
       </div>
-      <div class="frow-reason">
-        <label>Reason for Change:</label>
-        <input class="fi" style="flex:1;min-width:190px" type="text" id="f${i}_rc" oninput="autosave()">
+      <div class="line">
+        <span class="lbl" style="min-width:152px;">Reason for Change:</span>
+        <input id="foil${i}_reason" class="field w-xl" type="text">
       </div>`;
-    c.appendChild(d);
+    container.appendChild(block);
   }
 }
 
-// ── Load / Read ────────────────────────────────────────────
+
+/* ============================================================
+   14. LOAD FORM
+   Fills all form fields from a data object.
+   ============================================================ */
 function loadForm(data) {
-  const d = data || emptyForm();
-  document.getElementById('totalThickness').value    = d.totalThickness || '';
-  document.getElementById('lotNumber').value         = d.lotNumber      || '';
-  document.getElementById('ovenTemp').value          = d.ovenTemp       || '';
-  document.getElementById('otherSpec').value         = d.otherSpec      || '';
+  const d = data || buildEmptyForm();
+
+  document.getElementById('totalThickness').value    = d.totalThickness    || '';
+  document.getElementById('lotNumber').value         = d.lotNumber         || '';
+  document.getElementById('ovenTemp').value          = d.ovenTemp          || '';
+  document.getElementById('otherSpec').value         = d.otherSpec         || '';
   document.getElementById('carouselInstalled').value = d.carouselInstalled || '';
   document.getElementById('carouselRemoved').value   = d.carouselRemoved   || '';
 
-  // Update form title and extractor label to reflect active machine/EPR
-  document.getElementById('formMachineLabel').textContent = `TR30-${currentMachine}`;
-  document.getElementById('extractorLabel').textContent   = `EPR ${currentEPR}`;
+  (d.pos || []).forEach((v, i) => {
+    const el = document.getElementById(`pos${i + 1}`);
+    if (el) el.value = v || '';
+  });
 
-  (d.pos||[]).forEach((v,i)=>{ const el=document.getElementById(`pos${i+1}`); if(el) el.value=v||''; });
-  (d.foils||[]).forEach((f,i)=>{
-    if(i>=5) return; f=f||{};
-    document.getElementById(`f${i}_sd`).value = f.startDate||'';
-    tpSetValue(`f${i}_st`, f.startTime||'');
-    document.getElementById(`f${i}_sr`).value = f.startRun ||'';
-    document.getElementById(`f${i}_so`).value = f.startOp  ||'';
-    document.getElementById(`f${i}_ed`).value = f.endDate  ||'';
-    tpSetValue(`f${i}_et`, f.endTime||'');
-    document.getElementById(`f${i}_er`).value = f.endRun   ||'';
-    document.getElementById(`f${i}_eo`).value = f.endOp    ||'';
-    document.getElementById(`f${i}_td`).value = f.totalDose||'';
-    document.getElementById(`f${i}_rc`).value = f.reason   ||'';
+  (d.foils || []).forEach((foil, i) => {
+    if (i >= 5) return;
+    foil = foil || {};
+    document.getElementById(`foil${i}_startDate`).value = foil.startDate || '';
+    document.getElementById(`foil${i}_startTime`).value = foil.startTime || '';
+    document.getElementById(`foil${i}_startRun`).value  = foil.startRun  || '';
+    document.getElementById(`foil${i}_startOp`).value   = foil.startOp   || '';
+    document.getElementById(`foil${i}_endDate`).value   = foil.endDate   || '';
+    document.getElementById(`foil${i}_endTime`).value   = foil.endTime   || '';
+    document.getElementById(`foil${i}_endRun`).value    = foil.endRun    || '';
+    document.getElementById(`foil${i}_endOp`).value     = foil.endOp     || '';
+    document.getElementById(`foil${i}_totalDose`).value = foil.totalDose || '';
+    document.getElementById(`foil${i}_reason`).value    = foil.reason    || '';
   });
 }
 
+
+/* ============================================================
+   15. READ FORM
+   Collects all form field values into a data object for saving.
+   ============================================================ */
 function readForm() {
-  const foils=[];
-  for(let i=0;i<5;i++){
+  const foils = [];
+  for (let i = 0; i < 5; i++) {
     foils.push({
-      startDate: document.getElementById(`f${i}_sd`).value,
-      startTime: tpGetValue(`f${i}_st`),
-      startRun:  document.getElementById(`f${i}_sr`).value,
-      startOp:   document.getElementById(`f${i}_so`).value,
-      endDate:   document.getElementById(`f${i}_ed`).value,
-      endTime:   tpGetValue(`f${i}_et`),
-      endRun:    document.getElementById(`f${i}_er`).value,
-      endOp:     document.getElementById(`f${i}_eo`).value,
-      totalDose: document.getElementById(`f${i}_td`).value,
-      reason:    document.getElementById(`f${i}_rc`).value,
+      startDate: document.getElementById(`foil${i}_startDate`).value,
+      startTime: document.getElementById(`foil${i}_startTime`).value,
+      startRun:  document.getElementById(`foil${i}_startRun`).value,
+      startOp:   document.getElementById(`foil${i}_startOp`).value,
+      endDate:   document.getElementById(`foil${i}_endDate`).value,
+      endTime:   document.getElementById(`foil${i}_endTime`).value,
+      endRun:    document.getElementById(`foil${i}_endRun`).value,
+      endOp:     document.getElementById(`foil${i}_endOp`).value,
+      totalDose: document.getElementById(`foil${i}_totalDose`).value,
+      reason:    document.getElementById(`foil${i}_reason`).value,
     });
   }
+
   return {
     totalThickness:    document.getElementById('totalThickness').value,
     lotNumber:         document.getElementById('lotNumber').value,
@@ -1308,427 +888,277 @@ function readForm() {
     otherSpec:         document.getElementById('otherSpec').value,
     carouselInstalled: document.getElementById('carouselInstalled').value,
     carouselRemoved:   document.getElementById('carouselRemoved').value,
-    machine: `TR30-${currentMachine}`,
-    pos: [1,2,3,4,5].map(n=>document.getElementById(`pos${n}`).value),
-    foils, savedAt: new Date().toISOString(),
-    epr: currentEPR, machineNum: currentMachine
+    machine: `TR30-${activeMachine}`,
+    epr:     activeExtractor,
+    savedAt: new Date().toISOString(),
+    pos:     [1,2,3,4,5].map(n => document.getElementById(`pos${n}`).value),
+    foils
   };
 }
 
-// ── Time Picker ────────────────────────────────────────────
-const _tpCallbacks = {};
-const _tpHour = {};
 
-function tpHTML(id, callbackKey) {
-  const hrs  = Array.from({length:24}, (_,h) =>
-    `<div class="tp-cell" data-h="${h}" onclick="tpSelectHour('${id}',${h})">${String(h).padStart(2,'00')}</div>`
-  ).join('');
-  const mins = Array.from({length:60}, (_,m) =>
-    `<div class="tp-cell" data-m="${m}" onclick="tpSelectMin('${id}',${m},'${callbackKey}')">${String(m).padStart(2,'00')}</div>`
-  ).join('');
-  return `
-    <div class="tp-wrap" id="tp_${id}">
-      <input type="hidden" id="${id}" value="">
-      <button type="button" class="tp-btn empty" id="tp_${id}_btn" onclick="tpOpen('${id}')" tabindex="0">--:--</button>
-      <div class="tp-popup" id="tp_${id}_pop">
-        <div class="tp-col">
-          <div class="tp-col-hdr">Hour</div>
-          <div class="tp-grid tp-hr-grid" id="tp_${id}_hgrid">${hrs}</div>
-        </div>
-        <div class="tp-col">
-          <div class="tp-col-hdr">Min</div>
-          <div class="tp-grid tp-mn-grid" id="tp_${id}_mgrid">${mins}</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function tpOpen(id) {
-  document.querySelectorAll('.tp-popup.open').forEach(p => {
-    if (p.id !== `tp_${id}_pop`) p.classList.remove('open');
-  });
-  const pop = document.getElementById(`tp_${id}_pop`);
-  if (!pop) return;
-  if (pop.classList.contains('open')) { pop.classList.remove('open'); return; }
-  pop.classList.add('open');
-  const cur = document.getElementById(id).value;
-  if (cur) {
-    const [h, m] = cur.split(':').map(Number);
-    _tpHour[id] = h;
-    tpHighlight(id, h, m);
-  }
-}
-
-function tpSelectHour(id, h) {
-  _tpHour[id] = h;
-  const hgrid = document.getElementById(`tp_${id}_hgrid`);
-  if (hgrid) hgrid.querySelectorAll('.tp-cell').forEach(c => c.classList.toggle('selected', +c.dataset.h === h));
-}
-
-function tpSelectMin(id, m, callbackKey) {
-  const h   = (_tpHour[id] !== undefined) ? _tpHour[id] : 0;
-  const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  document.getElementById(id).value = val;
-  const btn = document.getElementById(`tp_${id}_btn`);
-  btn.textContent = val;
-  btn.classList.remove('empty');
-  btn.classList.add('has-value');
-  tpHighlight(id, h, m);
-  document.getElementById(`tp_${id}_pop`).classList.remove('open');
-  if (callbackKey && _tpCallbacks[callbackKey]) _tpCallbacks[callbackKey]();
-  autosave();
-}
-
-function tpHighlight(id, h, m) {
-  const hgrid = document.getElementById(`tp_${id}_hgrid`);
-  const mgrid = document.getElementById(`tp_${id}_mgrid`);
-  if (hgrid) hgrid.querySelectorAll('.tp-cell').forEach(c => c.classList.toggle('selected', +c.dataset.h === h));
-  if (mgrid) mgrid.querySelectorAll('.tp-cell').forEach(c => c.classList.toggle('selected', +c.dataset.m === m));
-}
-
-function tpSetValue(id, val) {
-  const hidden = document.getElementById(id);
-  const btn    = document.getElementById(`tp_${id}_btn`);
-  if (!hidden || !btn) return;
-  if (val) {
-    hidden.value = val;
-    btn.textContent = val;
-    btn.classList.remove('empty');
-    btn.classList.add('has-value');
-    const [h] = val.split(':').map(Number);
-    _tpHour[id] = h;
-  } else {
-    hidden.value = '';
-    btn.textContent = '--:--';
-    btn.classList.add('empty');
-    btn.classList.remove('has-value');
-  }
-}
-
-function tpGetValue(id) {
-  const el = document.getElementById(id);
-  return el ? el.value : '';
-}
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.tp-wrap')) {
-    document.querySelectorAll('.tp-popup.open').forEach(p => p.classList.remove('open'));
-  }
-});
-
-// ── Auto-populate next foil ────────────────────────────────
-function autoFillNextRun(i) {
-  const next = i + 1;
+/* ============================================================
+   16. AUTO-FILL NEXT FOIL
+   When an operator fills in a foil's end date or end run,
+   those values are copied into the next foil's start fields
+   (only if those fields are empty).
+   End time is NOT copied — operators enter start time manually.
+   ============================================================ */
+function maybeCopyEndDateToNextFoil(index) {
+  const next = index + 1;
   if (next >= 5) return;
-  const endRun = document.getElementById(`f${i}_er`).value;
-  const nextSR = document.getElementById(`f${next}_sr`);
-  if (!nextSR.value && endRun) nextSR.value = endRun;
+  const endDate   = document.getElementById(`foil${index}_endDate`).value;
+  const nextStart = document.getElementById(`foil${next}_startDate`);
+  if (endDate && !nextStart.value) { nextStart.value = endDate; autosave(); }
 }
 
-function onEndDateTimeChange(i) {
-  autosave();
-  const next = i + 1;
+function maybeCopyEndRunToNextFoil(index) {
+  const next = index + 1;
   if (next >= 5) return;
-  const endDate = document.getElementById(`f${i}_ed`).value;
-  const endTime = tpGetValue(`f${i}_et`);
-  const nextSD  = document.getElementById(`f${next}_sd`);
-  if (!nextSD.value && endDate) nextSD.value = endDate;
-  if (!tpGetValue(`f${next}_st`) && endTime) tpSetValue(`f${next}_st`, endTime);
-  autosave();
+  const endRun    = document.getElementById(`foil${index}_endRun`).value;
+  const nextStart = document.getElementById(`foil${next}_startRun`);
+  if (endRun && !nextStart.value) { nextStart.value = endRun; autosave(); }
 }
 
-// ── Autosave ───────────────────────────────────────────────
+
+/* ============================================================
+   17. AUTOSAVE
+   Saves the draft 250ms after the operator stops typing.
+   Only runs on the draft page, not on saved read-only records.
+   ============================================================ */
 function autosave() {
-  if (viewIndex !== 0 && !isEditing) return;
+  if (pageViewIndex !== 0 && !editModeActive) return;
   clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(() => saveDraft(readForm()), 400);
+  autosaveTimer = setTimeout(() => saveDraft(readForm()), 250);
 }
 
-// ── Page data helpers ──────────────────────────────────────
-function getPageData(idx) {
-  if (idx === 0) return _currentDraft || emptyForm();
-  const savedIdx = _currentPages.length - idx;
-  return _currentPages[savedIdx] || emptyForm();
+
+/* ============================================================
+   18. PAGE DATA HELPERS
+   pageViewIndex 0 = draft. 1 = most recently saved page.
+   Higher numbers go further back in history.
+   ============================================================ */
+function getViewedPage() {
+  if (pageViewIndex === 0) return currentDraft || buildEmptyForm();
+  return savedPages[savedPages.length - pageViewIndex] || buildEmptyForm();
 }
 
-function totalPageCount() { return 1 + _currentPages.length; }
+function getNextPageNumber() {
+  if (!savedPages.length) return 1;
+  return Math.max(...savedPages.map(p => Number(p.pageNumber) || 0)) + 1;
+}
 
-// ── Edit saved record ──────────────────────────────────────
+
+/* ============================================================
+   19. EDIT SAVED RECORD
+   ============================================================ */
 function startEdit() {
-  isEditing = true;
+  editModeActive = true;
   applyViewState();
   showToast('Editing record — click Save Changes when done.');
 }
 
 function cancelEdit() {
-  isEditing = false;
-  loadForm(getPageData(viewIndex));
+  editModeActive = false;
+  loadForm(getViewedPage());
   applyViewState();
   showToast('Edit cancelled.');
 }
 
 async function saveEdit() {
-  const savedIdx = _currentPages.length - viewIndex;
-  const updated  = readForm();
-  updated.pageNumber = _currentPages[savedIdx].pageNumber;
-  updated.savedAt    = _currentPages[savedIdx].savedAt;
+  const saveIndex = savedPages.length - pageViewIndex;
+  const original  = savedPages[saveIndex];
+  if (!original) return;
+
+  const updated      = readForm();
+  updated.pageNumber = original.pageNumber;
+  updated.savedAt    = original.savedAt;
   updated.editedAt   = new Date().toISOString();
-  _currentPages[savedIdx] = updated;
-  await savePages(_currentPages);
-  isEditing = false;
+
+  savedPages[saveIndex] = updated;
+  await writeSavedPages(savedPages);
+  editModeActive = false;
+  loadForm(updated);
   applyViewState();
-  showToast('Record updated.');
+  showToast(`Page ${updated.pageNumber} updated.`);
 }
 
-// ── View state ─────────────────────────────────────────────
+
+/* ============================================================
+   20. VIEW STATE
+   Controls which buttons are visible, read-only state,
+   and navigation counters. Called any time the view changes.
+   ============================================================ */
 function applyViewState() {
-  const isReadOnly = viewIndex !== 0 && !isEditing;
-  const sheet  = document.getElementById('formSheet');
-  const banner = document.getElementById('roBanner');
-  const total  = totalPageCount();
+  const isSaved    = pageViewIndex !== 0;
+  const isReadOnly = isSaved && !editModeActive;
 
-  sheet.classList.toggle('readonly', isReadOnly);
-  banner.classList.toggle('show', viewIndex !== 0);
-  document.getElementById('roBadge').classList.toggle('show', viewIndex !== 0 && !isEditing);
+  document.getElementById('formSheet').classList.toggle('readonly', isReadOnly);
+  document.getElementById('roBadge').classList.toggle('show', isReadOnly);
 
-  const saved = viewIndex !== 0;
-  document.getElementById('btnSave').style.display       = !saved           ? '' : 'none';
-  document.getElementById('btnNew').style.display        = !saved           ? '' : 'none';
-  document.getElementById('btnReprint').style.display    = saved && !isEditing ? '' : 'none';
-  document.getElementById('btnDelete').style.display     = saved && !isEditing ? '' : 'none';
-  document.getElementById('btnEdit').style.display       = saved && !isEditing ? '' : 'none';
-  document.getElementById('btnSaveEdit').style.display   = saved && isEditing  ? '' : 'none';
-  document.getElementById('btnCancelEdit').style.display = saved && isEditing  ? '' : 'none';
+  const banner = document.getElementById('sheetBanner');
+  banner.classList.toggle('show', isSaved);
+  banner.classList.toggle('editing', editModeActive);
+  banner.textContent = editModeActive
+    ? '✏️ Editing Saved Record — click Save Changes when done'
+    : '🔒 Read Only — Saved Record';
 
-  if (isEditing) {
-    banner.textContent = '✏️ Editing Saved Record — click Save Changes when done';
-    banner.style.cssText = 'background:linear-gradient(135deg,#0e2a1e,#163d28);border-color:#3a9a6a;color:#5dca8a;display:block';
-  } else if (viewIndex !== 0) {
-    banner.textContent = '🔒 Read Only — Saved Record';
-    banner.style.cssText = '';
+  document.getElementById('machineLabel').textContent   = `TR30-${activeMachine}`;
+  document.getElementById('extractorLabel').textContent = `EPR ${activeExtractor}`;
+
+  // Draft is a separate state, not a numbered page.
+  // Only saved records get page numbers in the nav and footer.
+  if (pageViewIndex === 0) {
+    document.getElementById('navInfo').textContent    = 'Draft';
+    document.getElementById('formFooter').textContent = 'Draft';
+  } else {
+    const page  = savedPages[savedPages.length - pageViewIndex];
+    const label = page?.pageNumber || pageViewIndex;
+    document.getElementById('navInfo').textContent    = `Page ${label} of ${savedPages.length}`;
+    document.getElementById('formFooter').textContent = `Page ${label} of ${savedPages.length}`;
   }
 
-  const displayPage = total - viewIndex;
-  document.getElementById('navInfo').textContent       = `Page ${displayPage} of ${total}`;
-  document.getElementById('formFooter').textContent    = `Page ${displayPage} of ${total}`;
-  document.getElementById('btnJump').style.display     = viewIndex > 0 ? '' : 'none';
-  document.getElementById('btnPrev').disabled          = viewIndex === 0 || isEditing;
-  document.getElementById('btnNext').disabled          = viewIndex >= total - 1 || isEditing;
+  document.getElementById('prevPageBtn').disabled = pageViewIndex === 0 || editModeActive;
+  document.getElementById('nextPageBtn').disabled = pageViewIndex >= savedPages.length || editModeActive;
+  document.getElementById('jumpToDraftBtn').style.display = pageViewIndex > 0 ? '' : 'none';
 
-  const ahead = total - viewIndex - 1;
-  document.querySelector('.page-ghost-1').style.display = ahead >= 1 ? '' : 'none';
-  document.querySelector('.page-ghost-2').style.display = ahead >= 2 ? '' : 'none';
-  document.querySelector('.page-ghost-3').style.display = ahead >= 3 ? '' : 'none';
+  document.getElementById('savePageBtn').style.display  = !isSaved                  ? '' : 'none';
+  document.getElementById('newPageBtn').style.display   = !isSaved                  ? '' : 'none';
+  document.getElementById('deletePageBtn').style.display = isSaved && !editModeActive ? '' : 'none';
+  document.getElementById('reprintBtn').style.display   = isSaved && !editModeActive ? '' : 'none';
+  document.getElementById('editBtn').style.display      = isSaved && !editModeActive ? '' : 'none';
+  document.getElementById('cancelEditBtn').style.display = isSaved && editModeActive  ? '' : 'none';
+  document.getElementById('saveEditBtn').style.display  = isSaved && editModeActive  ? '' : 'none';
+
+  document.querySelectorAll('#machineToggle button').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.machine) === activeMachine);
+  });
+  document.querySelectorAll('#extractorToggle button').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.extractor) === activeExtractor);
+  });
 }
 
-// ── Page flip ─────────────────────────────────────────────
-function flipPage(dir, callback) {
-  isEditing = false;
 
-  const form = document.getElementById('formSheet');
-  const wrap = document.getElementById('bookWrap');
-  const w    = form.offsetWidth;
-  const h    = form.offsetHeight;
-  const isForward = dir > 0;
+/* ============================================================
+   21. NAVIGATION
+   ============================================================ */
+function changeViewedPage(newIndex) {
+  if (newIndex < 0 || newIndex > savedPages.length) return;
+  if (editModeActive) return;
+  if (pageViewIndex === 0) saveDraft(readForm());
+  pageViewIndex = newIndex;
+  loadForm(getViewedPage());
+  applyViewState();
+}
 
-  // Snapshot the outgoing page before updating data
-  function makeSnap() {
-    const s = document.createElement('div');
-    s.style.cssText = `position:absolute;inset:0;width:${w}px;height:${h}px;
-      background:#f9f8f5;overflow:hidden;box-sizing:border-box;
-      padding:24px 34px 20px;border-top:2px solid rgba(245,166,35,.3);
-      font-family:'Courier Prime',monospace;font-size:12.5px;line-height:1.5;color:#111;`;
-    s.innerHTML = form.innerHTML;
-    s.querySelectorAll('input').forEach(inp => {
-      const sp = document.createElement('span');
-      sp.textContent = ['hidden','radio','checkbox'].includes(inp.type) ? '' : (inp.value || '');
-      sp.style.cssText = 'border-bottom:1px solid #bbb;display:inline-block;min-width:50px;vertical-align:bottom;';
-      inp.replaceWith(sp);
-    });
-    s.querySelectorAll('.tp-popup').forEach(el => el.remove());
-    s.querySelectorAll('.tp-btn').forEach(btn => {
-      const sp = document.createElement('span');
-      sp.textContent = btn.textContent || '--:--';
-      sp.style.cssText = 'border-bottom:1px solid #bbb;display:inline-block;min-width:55px;vertical-align:bottom;';
-      btn.replaceWith(sp);
-    });
-    s.querySelectorAll('button,#loadOverlay').forEach(el => el.remove());
-    return s;
+
+/* ============================================================
+   22. SWITCH MACHINE
+   Each machine has its own independent set of log data.
+   Blocked during edit mode — unsaved edits would be lost.
+   ============================================================ */
+async function switchMachine(machineNumber) {
+  if (machineNumber === activeMachine) return;
+  if (editModeActive) {
+    if (!confirm('You have unsaved edits. Switch machine and discard them?')) return;
   }
-
-  // 1. Capture outgoing snapshot
-  const outSnap = makeSnap();
-
-  // Save title before callback changes it
-  const titleEl  = document.getElementById('formMachineLabel');
-  const oldTitle = titleEl ? titleEl.textContent : '';
-
-  // 2. Load new content into the real form invisibly, then snap visible
-  form.style.opacity = '0';
-  callback();
-
-  // Grab new title then restore old one — swap in after animation
-  const newTitle = titleEl ? titleEl.textContent : '';
-  if (titleEl) titleEl.textContent = oldTitle;
-
-  // 3. Build the flip leaf — just the outgoing page peeling away
-  const leaf = document.createElement('div');
-  leaf.style.cssText = `
-    position:absolute;top:0;left:0;width:${w}px;height:${h}px;z-index:50;
-    pointer-events:none;transform-style:preserve-3d;
-    transform-origin:${isForward ? 'left' : 'right'} center;
-    transform:rotateY(0deg);
-  `;
-  leaf.appendChild(outSnap);
-
-  // Shadow that builds from the spine as the leaf lifts
-  const spineShadow = document.createElement('div');
-  spineShadow.style.cssText = `position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;
-    background:linear-gradient(${isForward ? 'to right' : 'to left'},rgba(0,0,0,.5) 0%,transparent 55%);`;
-  outSnap.appendChild(spineShadow);
-
-  // Underlay shadow cast onto the form below
-  const underShadow = document.createElement('div');
-  underShadow.style.cssText = `position:absolute;top:0;left:0;width:${w}px;height:${h}px;
-    z-index:3;pointer-events:none;opacity:0;
-    background:linear-gradient(${isForward ? 'to right' : 'to left'},transparent 0%,rgba(0,0,0,.22) 50%,transparent 100%);`;
-
-  wrap.style.perspective = '1600px';
-  wrap.style.perspectiveOrigin = 'center 38%';
-  wrap.appendChild(leaf);
-  wrap.appendChild(underShadow);
-
-  const dur  = 800;
-  const ease = 'cubic-bezier(0.645, 0.045, 0.355, 1.000)';
-  const end  = isForward ? -180 : 180;
-
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    setTimeout(() => { form.style.opacity = '1'; }, dur * 0.5);
-    leaf.style.transition        = `transform ${dur}ms ${ease}`;
-    leaf.style.transform         = `rotateY(${end}deg)`;
-    spineShadow.style.transition = `opacity ${dur * 0.5}ms ease-in`;
-    spineShadow.style.opacity    = '1';
-    underShadow.style.transition = `opacity ${dur * 0.35}ms ease-in`;
-    underShadow.style.opacity    = '0.9';
-    setTimeout(() => {
-      underShadow.style.transition = `opacity ${dur * 0.4}ms ease-out`;
-      underShadow.style.opacity    = '0';
-    }, dur * 0.45);
-
-    setTimeout(() => {
-      if (titleEl) titleEl.textContent = newTitle;
-      leaf.remove();
-      underShadow.remove();
-      wrap.style.perspective = '';
-      wrap.style.perspectiveOrigin = '';
-    }, dur + 30);
-  }));
+  if (pageViewIndex === 0) saveDraft(readForm());
+  activeMachine = machineNumber;
+  pageViewIndex = 0;
+  editModeActive = false;
+  await reloadAllData();
+  loadForm(getViewedPage());
+  applyViewState();
 }
 
-// ── Navigate ───────────────────────────────────────────────
-function navigate(dir) {
-  const total  = totalPageCount();
-  const newIdx = viewIndex + dir;
-  if (newIdx < 0 || newIdx >= total) return;
-  if (viewIndex === 0) saveDraft(readForm());
-  flipPage(dir, () => { viewIndex = newIdx; loadForm(getPageData(viewIndex)); applyViewState(); });
+
+/* ============================================================
+   23. SWITCH EXTRACTOR
+   Each extractor has its own independent set of log data.
+   Blocked during edit mode — unsaved edits would be lost.
+   ============================================================ */
+async function switchExtractor(extractorNumber) {
+  if (extractorNumber === activeExtractor) return;
+  if (editModeActive) {
+    if (!confirm('You have unsaved edits. Switch extractor and discard them?')) return;
+  }
+  if (pageViewIndex === 0) saveDraft(readForm());
+  activeExtractor = extractorNumber;
+  pageViewIndex   = 0;
+  editModeActive  = false;
+  await reloadAllData();
+  loadForm(getViewedPage());
+  applyViewState();
 }
 
-function jumpToFront() {
-  if (viewIndex === 0) return;
-  flipPage(-1, () => { viewIndex = 0; loadForm(getPageData(0)); applyViewState(); });
-}
 
-// ── Switch machine ─────────────────────────────────────────
-async function switchMachine(m) {
-  if (m === currentMachine) return;
-  if (viewIndex === 0) await saveDraft(readForm());
-  currentMachine = m;
-  viewIndex = 0;
-  document.getElementById('btnTR1').classList.toggle('active', m === 1);
-  document.getElementById('btnTR2').classList.toggle('active', m === 2);
-  document.getElementById('extractorLabel').textContent = `EPR ${currentEPR}`;
-  await reloadAll();
-  flipPage(1, () => { loadForm(getPageData(0)); applyViewState(); });
-}
-
-// ── Switch EPR ─────────────────────────────────────────────
-async function switchEPR(epr) {
-  if (epr === currentEPR) return;
-  if (viewIndex === 0) await saveDraft(readForm());
-  currentEPR = epr;
-  viewIndex  = 0;
-  document.getElementById('btn41').classList.toggle('active', epr === 41);
-  document.getElementById('btn42').classList.toggle('active', epr === 42);
-  await reloadAll();
-  flipPage(1, () => { loadForm(getPageData(0)); applyViewState(); });
-}
-
-// ── Delete page ────────────────────────────────────────────
+/* ============================================================
+   24. DELETE PAGE
+   Only works on saved pages, not the draft.
+   ============================================================ */
 async function deleteCurrentPage() {
-  if (viewIndex === 0) return;
-  const savedIdx = _currentPages.length - viewIndex;
-  const pageNum  = _currentPages[savedIdx]?.pageNumber || (savedIdx + 1);
-  if (!confirm(`Delete Page ${pageNum} for TR30-${currentMachine} / EPR-${currentEPR}? This cannot be undone.`)) return;
-  _currentPages.splice(savedIdx, 1);
-  await savePages(_currentPages);
-  const newIdx = Math.min(viewIndex, totalPageCount() - 1);
-  flipPage(-1, () => { viewIndex = newIdx; loadForm(getPageData(viewIndex)); applyViewState(); showToast(`Page ${pageNum} deleted.`); });
+  if (pageViewIndex === 0) return;
+  const saveIndex = savedPages.length - pageViewIndex;
+  const page      = savedPages[saveIndex];
+  if (!page) return;
+  const label = page.pageNumber || '(unnumbered)';
+  if (!confirm(`Delete page ${label} for TR30-${activeMachine} / EPR-${activeExtractor}? This cannot be undone.`)) return;
+  savedPages.splice(saveIndex, 1);
+  await writeSavedPages(savedPages);
+  if (pageViewIndex > savedPages.length) pageViewIndex = savedPages.length;
+  loadForm(getViewedPage());
+  applyViewState();
+  showToast(`Page ${label} deleted.`);
 }
 
-// ── Save + PDF ─────────────────────────────────────────────
-async function savePage() {
-  const data    = readForm();
-  const pageNum = _currentPages.length + 1;
-  data.pageNumber = pageNum;
-  _currentPages.push(data);
-  await savePages(_currentPages);
-  await saveDraft(emptyForm()); // clear draft on server
-  ls_del(draftKey());
 
-  showToast(`Page ${pageNum} saved. Use "Save to PDF" in the print dialog.`);
+/* ============================================================
+   25. SAVE PAGE AND PRINT PDF
+   Saves the draft as a completed record, opens the print
+   dialog, then shows the saved record as read-only.
+   Canceling the print dialog still shows the saved record —
+   it is not lost.
+   ============================================================ */
+async function savePage() {
+  const formData = readForm();
+  formData.pageNumber = getNextPageNumber();
+
+  savedPages.push(formData);
+  await writeSavedPages(savedPages);
+
+  showToast(`Page ${formData.pageNumber} saved. Use "Save to PDF" in the print dialog.`);
 
   setTimeout(() => {
     window.print();
+    // After print (or cancel): clear the draft, then show the saved record.
+    // clearDraft() is deferred until here so the state mutation happens in one
+    // place at the end of the save cycle, making the flow easier to follow.
     window.addEventListener('afterprint', function handler() {
       window.removeEventListener('afterprint', handler);
-      _currentDraft = emptyForm();
-      viewIndex = 0;
-      loadForm(emptyForm());
+      clearDraft();
+      pageViewIndex = 1;
+      loadForm(getViewedPage());
       applyViewState();
     });
-  }, 300);
+  }, 250);
 }
 
-// ── Print prep ─────────────────────────────────────────────
+
+/* ============================================================
+   26. PRINT PREPARATION
+   Replaces input fields with plain text spans before printing,
+   then restores them after.
+   ============================================================ */
 function prepareForPrint() {
-  document.querySelectorAll('.form-sheet input[type="text"], .form-sheet input[type="hidden"]').forEach(inp => {
-    if (inp.closest('.tp-wrap')) return;
+  const selectors = '.sheet input[type="text"], .sheet input[type="date"], .sheet input[type="time"]';
+  document.querySelectorAll(selectors).forEach(input => {
     const span = document.createElement('span');
     span.className = 'print-val';
-    span.textContent = inp.value || '';
-    span.style.cssText = 'font-family:Courier Prime,monospace;font-size:inherit;border-bottom:1px solid #999;display:inline-block;min-width:' + (inp.offsetWidth || 60) + 'px;';
-    inp.dataset.printReplace = '1';
-    inp.parentNode.insertBefore(span, inp);
-    inp.style.display = 'none';
-  });
-  document.querySelectorAll('.form-sheet input[type="date"]').forEach(inp => {
-    const span = document.createElement('span');
-    span.className = 'print-val';
-    span.textContent = inp.value || '';
-    span.style.cssText = 'font-family:Courier Prime,monospace;font-size:inherit;border-bottom:1px solid #999;display:inline-block;min-width:120px;';
-    inp.dataset.printReplace = '1';
-    inp.parentNode.insertBefore(span, inp);
-    inp.style.display = 'none';
-  });
-  document.querySelectorAll('.tp-btn').forEach(btn => {
-    const span = document.createElement('span');
-    span.className = 'print-val';
-    span.textContent = btn.textContent || '--:--';
-    span.style.cssText = 'font-family:Courier Prime,monospace;font-size:inherit;border-bottom:1px solid #999;display:inline-block;min-width:60px;';
-    btn.dataset.printReplace = '1';
-    btn.parentNode.insertBefore(span, btn);
-    btn.style.display = 'none';
+    span.textContent = input.value || '';
+    span.style.cssText = `font-family:Courier Prime,monospace;font-size:inherit;border-bottom:1px solid #999;display:inline-block;min-width:${Math.max(input.offsetWidth || 60, 60)}px;`;
+    input.dataset.printReplace = '1';
+    input.parentNode.insertBefore(span, input);
+    input.style.display = 'none';
   });
 }
 
@@ -1740,29 +1170,83 @@ function restoreAfterPrint() {
   });
 }
 
-window.addEventListener('beforeprint', prepareForPrint);
-window.addEventListener('afterprint',  restoreAfterPrint);
 
-function reprintCurrent() { showToast('Opening print dialog...'); setTimeout(()=> window.print(), 400); }
-function printForm()      { window.print(); }
-
-// ── New Page ───────────────────────────────────────────────
-async function newPage() {
-  if (!confirm('Start a new page? Unsaved data will be lost.')) return;
-  await saveDraft(emptyForm());
-  ls_del(draftKey());
-  _currentDraft = emptyForm();
-  viewIndex = 0;
-  loadForm(emptyForm());
+/* ============================================================
+   27. NEW PAGE
+   Clears the draft and starts fresh.
+   ============================================================ */
+function newPage() {
+  if (!confirm('Start a new page? Unsaved draft data will be lost.')) return;
+  clearDraft();
+  pageViewIndex  = 0;
+  editModeActive = false;
+  loadForm(currentDraft);
   applyViewState();
-  showToast(`New page started — TR30-${currentMachine} / EPR-${currentEPR}.`);
+  showToast(`New page started — TR30-${activeMachine} / EPR-${activeExtractor}.`);
 }
 
-// ── Init ───────────────────────────────────────────────────
-(async function init() {
-  renderFoils();
-  await reloadAll();
-  loadForm(getPageData(0));
+
+/* ============================================================
+   28. EVENT WIRING
+   All event listeners are attached here, not in the HTML.
+   ============================================================ */
+function attachEventListeners() {
+  // Navigation
+  document.getElementById('prevPageBtn').addEventListener('click', () => changeViewedPage(pageViewIndex - 1));
+  document.getElementById('nextPageBtn').addEventListener('click', () => changeViewedPage(pageViewIndex + 1));
+  document.getElementById('jumpToDraftBtn').addEventListener('click', () => changeViewedPage(0));
+
+  // Machine and extractor toggles
+  document.querySelectorAll('#machineToggle button').forEach(btn => {
+    btn.addEventListener('click', () => switchMachine(Number(btn.dataset.machine)));
+  });
+  document.querySelectorAll('#extractorToggle button').forEach(btn => {
+    btn.addEventListener('click', () => switchExtractor(Number(btn.dataset.extractor)));
+  });
+
+  // Action buttons
+  document.getElementById('deletePageBtn').addEventListener('click', deleteCurrentPage);
+  document.getElementById('reprintBtn').addEventListener('click', () => window.print());
+  document.getElementById('editBtn').addEventListener('click', startEdit);
+  document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+  document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('newPageBtn').addEventListener('click', newPage);
+  document.getElementById('savePageBtn').addEventListener('click', savePage);
+
+  // Top-level form fields
+  // Text fields: fire on input. Date fields: fire on change.
+  const textFields = ['totalThickness', 'lotNumber', 'ovenTemp', 'otherSpec', 'pos1', 'pos2', 'pos3', 'pos4', 'pos5'];
+  const dateFields = ['carouselInstalled', 'carouselRemoved'];
+  textFields.forEach(id => document.getElementById(id).addEventListener('input', autosave));
+  dateFields.forEach(id => document.getElementById(id).addEventListener('change', autosave));
+
+  // Foil block fields (wired after renderFoilBlocks creates them)
+  for (let i = 0; i < 5; i++) {
+    const foilTextFields = [`foil${i}_startRun`, `foil${i}_startOp`, `foil${i}_endRun`, `foil${i}_endOp`, `foil${i}_totalDose`, `foil${i}_reason`];
+    const foilDateFields = [`foil${i}_startDate`, `foil${i}_startTime`, `foil${i}_endDate`, `foil${i}_endTime`];
+    foilTextFields.forEach(id => document.getElementById(id).addEventListener('input', autosave));
+    foilDateFields.forEach(id => document.getElementById(id).addEventListener('change', autosave));
+
+    // Auto-fill end date and end run into next foil's start fields
+    document.getElementById(`foil${i}_endDate`).addEventListener('change', () => maybeCopyEndDateToNextFoil(i));
+    document.getElementById(`foil${i}_endRun`).addEventListener('change',  () => maybeCopyEndRunToNextFoil(i));
+  }
+
+  // Print hooks
+  window.addEventListener('beforeprint', prepareForPrint);
+  window.addEventListener('afterprint',  restoreAfterPrint);
+}
+
+
+/* ============================================================
+   29. APP STARTUP
+   ============================================================ */
+(async function startApp() {
+  renderFoilBlocks();
+  attachEventListeners();
+  await reloadAllData();
+  loadForm(getViewedPage());
   applyViewState();
 })();
 </script>
